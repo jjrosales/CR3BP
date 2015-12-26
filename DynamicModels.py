@@ -87,27 +87,16 @@ def CRTBP_Jacobian(time, state_vector):
  
     return J_CRTBP
     
-    
+ # returns Jacobian of the Poincare matrix  
 def P_Jacobian(time, state_vector):
     
-    J_P     = np.zeros((DIM+1, DIM+1), dtype=np.double)
-    f_CRTBP = np.zeros(DIM, dtype=np.double)
-    J_CRTBP = np.zeros((DIM, DIM), dtype=np.double)
-      
-    f_CRTBP = CRTBP (time, state_vector)
-    phi     = P_Phi (time, state_vector)
-    
-    J_P[0,0] = 1.0
-    J_P[0,1] = f_CRTBP[0]    
-    J_P[0,2] = f_CRTBP[1]    
-    J_P[0,3] = f_CRTBP[2]
-    J_P[0,4] = f_CRTBP[3]
+    J_P = np.zeros((DIM, DIM), dtype=np.double)
 
-    J_P[1:5, 1:5] = phi[0:4, 0:4]
+    J_P = P_Phi(time, state_vector)
 
     return J_P
-    
-    
+
+# return the first order approximation of the transition matrix    
 def P_Phi(time, state_vector):
     
     phi = np.eye(DIM, dtype=np.double)

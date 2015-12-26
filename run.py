@@ -17,7 +17,6 @@ from DynamicModels import P_Jacobian
 from Constants import *
 
 
-#plt.axis([-1, 1, -1, 1])
 
 time = 0
 target_period = 100.0*6.28
@@ -87,41 +86,34 @@ for i in range(1,30):
             
     
     #Solve for delta_sv
-    
-#    delta_sv[0]   = target_period - r.t
-#    delta_sv[1:5] = [pos_x[0], pos_y[0], vel_x[0], vel_y[0]] - state_vector[0:4]
 
     delta_sv = [pos_x[0], pos_y[0], vel_x[0], vel_y[0]]-state_vector
    
-    D_P =  P_Jacobian(r.t, state_vector) [1:5, 1:5]
-   
+    D_P =  P_Jacobian(r.t, state_vector)
+    
     D_P = np.linalg.inv(D_P)
     
     delta_sv = np.dot(D_P, delta_sv)
     
-    state_vector = [pos_x[0], pos_y[0], vel_x[0], vel_y[0]] - delta_sv #[1:5]
-
-#    target_period = target_period - delta_sv[0]
-    
+    state_vector = [pos_x[0], pos_y[0], vel_x[0], vel_y[0]] - delta_sv   
     print delta_sv, state_vector 
 
 
     # plotting
     
-    # plt.annotate('P1', xy=(-MU, 0), xytext=(-MU, -.1))
-    # plt.annotate('P2', xy=(-MU, 0), xytext=(1-MU, -.1))
-    # plt.plot(-MU, 0, 'ro')
-    # plt.plot(1-MU, 0, 'bo')
+    plt.annotate('P1', xy=(-MU, 0), xytext=(-MU, -.1))
+    plt.annotate('P2', xy=(-MU, 0), xytext=(1-MU, -.1))
+    plt.plot(-MU, 0, 'ro')
+    plt.plot(1-MU, 0, 'bo')
+       
+    plt.figure(1)
+    plt.plot([p_section, p_section], [-1, 1])
+    plt.plot(pos_x, pos_y)
     
+    plt.figure(2)  
+    plt.plot(vel_x, vel_y)    
     
-    # plt.figure(1)
-    # plt.plot([p_section, p_section], [-1, 1])
-    # plt.plot(pos_x, pos_y)
-    
-    # plt.figure(2)  
-    # plt.plot(vel_x, vel_y)    
-    
-    # plt.show()
+    plt.show()
 
 #
 target_period = 2.0 * r.t
