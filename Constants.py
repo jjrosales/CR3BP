@@ -3,7 +3,7 @@ __copyright__  = "TBD"
 __credits__    = "TBD"
 __license__    = "TBD"
 __maintainer__ = "Jose Rosales"
-__email__      = "jose.rosales@ai-solutions.com"
+__email__      = "pepe.rosales@gmail.com"
 __status__     = "Prototype"
 
 __version__ = "$Revision: 1a40d4eaa00b $"

@@ -3,7 +3,7 @@ __copyright__  = "TBD"
 __credits__    = "TBD"
 __license__    = "TBD"
 __maintainer__ = "Jose Rosales"
-__email__      = "jose.rosales@ai-solutions.com"
+__email__      = "pepe.rosales@gmail.com"
 __status__     = "Prototype"
 
 __version__ = "$Revision: 1a40d4eaa00b $"
@@ -123,6 +123,7 @@ class planar_CRTBP_DynSys:
         
         self.__intial_condition = np.zeros(self.__dim, dtype=np.double)
         self.__state_vector     = np.zeros(self.__dim, dtype=np.double)
+        self.__f_eval           = np.zeros(self.__dim, dtype=np.double)
         
         self.__JC = 0.0        
         
@@ -234,6 +235,9 @@ class planar_CRTBP_DynSys:
     def get_exec_flag(self):
         return self.__exec_ok
 
+    def get_f_eval(self):
+        return self.__f_eval
+
     # Evaluates the field
     def __f (self, time, state_vector):
         
@@ -263,7 +267,9 @@ class planar_CRTBP_DynSys:
         state_update[3] = state_update[3] - self.__mu*(state_vector[1])/r2
         state_update[3] = state_update[3] - one_minus_mu*state_vector[1]/r1 
 
-        return state_update
+        self.__f_eval = state_update
+ 
+        return self.__f_eval
 
     
     # Returns 'True' if the class is ready to process the inputs. 'False' otherwise.
