@@ -10,23 +10,21 @@ __version__ = "$Revision: 1a40d4eaa00b $"
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import ode
-from DynamicModels import CRTBP
-from DynamicModels import CRTBP_Jacobian
-from DynamicModels import P_Jacobian
-from DynamicModels import planar_CRTBP_DynSys
-
-from PoincareSections import g_poincare
+import DynamicModels
+import PoincareSections
 
 from Constants import *
 
 
-planar_CRTBP = planar_CRTBP_DynSys(MU)
-g = g_poincare()
+DynSys = DynamicModels.CRTBP_DynSys(MU)
+g = PoincareSections.g_poincare_3d()
 
 
+DIM           = DynSys.get_dim()
 time          = 0.0
-target_period = 1000.0*6.28
+target_period = 50.0*6.28
 period        = 0.0
 
 delta_t = 1e-3
@@ -39,11 +37,14 @@ D_P          = np.zeros((DIM, DIM), dtype=np.double)
 
 state_x = []
 state_y = []
+state_z = []
 
 state_vector[0] = .9
 state_vector[1] = 1e-1
-state_vector[2] = -1.667478e-1
-state_vector[3] = 1e-1
+state_vector[2] = 5e-4
+state_vector[3] = -1.e-1
+state_vector[4] = 1e-1
+state_vector[5] = -1.2e-3
 
 #
 #state_vector[0] = 0.8
@@ -52,19 +53,8 @@ state_vector[3] = 1e-1
 #state_vector[3] =  -0.271 
 
 
-print planar_CRTBP.get_Jacobi_Constant()
+p_section = state_vector[0]
 
-
-#sets the integrator
-r = ode(CRTBP).set_integrator('dopri5')
-r.set_initial_value(state_vector, time)
-
-
-# Generates the Poincare Map
-# The section is defined as x=state_vector[0]
-#
-# we want P(t_f, x(t_f) = x(t_0)
-p_section  =  state_vector[0] 
 
 g.set_center(state_vector)
 g.set_radius(1.25)
@@ -81,32 +71,37 @@ poincare_ydot = []
 
 pos_x = []
 pos_y = []
+pos_z = []
 vel_x = []
 vel_y = []
+vel_z = []
 
 pos_x.append(state_vector[0])     
-pos_y.append(state_vector[1])    
-vel_x.append(state_vector[2])     
-vel_y.append(state_vector[3])      
+pos_y.append(state_vector[1])   
+pos_z.append(state_vector[2])   
+vel_x.append(state_vector[3])     
+vel_y.append(state_vector[4])      
+vel_z.append(state_vector[5])      
 
 continue_flag = True
 index         = 0
 
 while time < target_period and continue_flag:
     
-    planar_CRTBP.set_initial_condition(state_vector)
-    planar_CRTBP.set_t0(time)
-    planar_CRTBP.set_tf(time+delta_t)
+    DynSys.set_initial_condition(state_vector)
+    DynSys.set_t0(time)
+    DynSys.set_tf(time+delta_t)
 
-    planar_CRTBP.go()
+    DynSys.go()
     
-    state_vector = planar_CRTBP.get_updated_state_vector()
-    time         = planar_CRTBP.get_updated_time()
+    state_vector = DynSys.get_updated_state_vector()
+    time         = DynSys.get_updated_time()
     
     g.set_x(state_vector)
     g.go()
+    
+#    print DynSys.get_Jacobi_Constant()
            
-          
 #    if (old_gx*g.get_gx()<0.0 and
 #        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
 #        time > 1.0):
@@ -119,47 +114,46 @@ while time < target_period and continue_flag:
         delta = 0.0
 
         while abs(g.get_gx())>x_tol:
-            delta = -g.get_gx()/np.dot(g.get_Dg(), planar_CRTBP.get_f_eval())
-            planar_CRTBP.set_initial_condition(sv_aux)
-            planar_CRTBP.set_t0(t_aux)
-            planar_CRTBP.set_tf(t_aux+delta)
+            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
+            DynSys.set_initial_condition(sv_aux)
+            DynSys.set_t0(t_aux)
+            DynSys.set_tf(t_aux+delta)
 
-            planar_CRTBP.go()
+            DynSys.go()
             
-            sv_aux = planar_CRTBP.get_updated_state_vector()
-            t_aux  = planar_CRTBP.get_updated_time()
-
-#            print '----->',  delta 
+            sv_aux = DynSys.get_updated_state_vector()
+            t_aux  = DynSys.get_updated_time()
 
             g.set_x(sv_aux)
             g.go()
         
         poincare_y   .append(state_vector[1])
-        poincare_ydot.append(state_vector[3])
+        poincare_ydot.append(state_vector[2])
         print t_aux, sv_aux
         
 #        continue_flag = False
 
     pos_x.append(state_vector[0])     
-    pos_y.append(state_vector[1])    
-    vel_x.append(state_vector[2])     
-    vel_y.append(state_vector[3])
+    pos_y.append(state_vector[1])   
+    pos_z.append(state_vector[2])   
+    vel_x.append(state_vector[3])     
+    vel_y.append(state_vector[4])      
+    vel_z.append(state_vector[5])  
     
     g.set_x(state_vector)
     g.go()
     old_gx = g.get_gx()
                 
-
     # get period
-    period = planar_CRTBP.get_updated_time()
+    period = DynSys.get_updated_time()
      
     #Solve for delta_sv
 
-#    print planar_CRTBP.get_exec_flag(), state_vector
+#    print DynSys.get_exec_flag(), state_vector
 
 #    delta_sv = [pos_x[0], pos_y[0], vel_x[0], vel_y[0]]-state_vector
    
-#    D_P =  planar_CRTBP.P_Jacobian(time, state_vector)
+#    D_P =  DynSys.P_Jacobian(time, state_vector)
 #    
 #    D_P =  P_Jacobian(time, state_vector)
 #    
@@ -190,6 +184,11 @@ plt.plot(vel_x, vel_y)
 plt.figure(3)  
 plt.plot(poincare_y, poincare_ydot, '.')   
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+ax.plot(pos_x, pos_y, pos_z)
+
 plt.show()    
 
 
@@ -200,14 +199,14 @@ plt.show()
 #while time <= target_period:
 #
 #    
-#    planar_CRTBP.set_initial_condition(state_vector)
-#    planar_CRTBP.set_t0(time)
-#    planar_CRTBP.set_tf(time+delta_t)
+#    DynSys.set_initial_condition(state_vector)
+#    DynSys.set_t0(time)
+#    DynSys.set_tf(time+delta_t)
 #
-#    planar_CRTBP.go()
+#    DynSys.go()
 #    
-#    state_vector = planar_CRTBP.get_updated_state_vector()
-#    time         = planar_CRTBP.get_updated_time()
+#    state_vector = DynSys.get_updated_state_vector()
+#    time         = DynSys.get_updated_time()
 #    
 #    pos_x.append(state_vector[0])     
 #    pos_y.append(state_vector[1])    

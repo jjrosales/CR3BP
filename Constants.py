@@ -9,8 +9,6 @@ __status__     = "Prototype"
 __version__ = "$Revision: 1a40d4eaa00b $"
 # $Source$
 
-#System dimension
-DIM = 4
 
 #Earth mu
 EARTH_MU = 398600.4418 # km^3/s^2
