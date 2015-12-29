@@ -275,28 +275,33 @@ class CRTBP_DynSys:
     # Returns the transition matrix    
     def get_Jacobi_Constant(self):
         if self.__cond__init_flag:
-            mu1 = 1 - self.__mu
-            mu2 = self.__mu
+            
+            x_minus_mu1 = self.__state_vector[0] - self.__mu_1
+            x_plus_mu2  = self.__state_vector[0] + self.__mu_2 
+            
+            y2 = self.__state_vector[1]*self.__state_vector[1]
+            z2 = self.__state_vector[2]*self.__state_vector[2]            
 
-            r1 =      self.__state_vector[1]*self.__state_vector[1]
-            r1 = r1 + self.__state_vector[2]*self.__state_vector[2]
-            r1 = r1 + (self.__state_vector[0]+mu2)*(self.__state_vector[0]+mu2)
+            x_minus_mu1 = self.__state_vector[0] - self.__mu_1
+            x_plus_mu2  = self.__state_vector[0] + self.__mu_2  
+            
+            aux  = y2 + z2           
+            
+            r1 = aux + x_plus_mu2*x_plus_mu2
             r1 = np.sqrt(r1)
             
-            r2 =      self.__state_vector[1]*self.__state_vector[1]
-            r2 = r2 + self.__state_vector[2]*self.__state_vector[2]            
-            r2 = r2 + (self.__state_vector[0]-mu1)*(self.__state_vector[0]-mu1)
+            r2 = aux + x_minus_mu1*x_minus_mu1
             r2 = np.sqrt(r2)
     
-            U =     mu1*r1*r1 
-            U = U + mu2*r2*r2
+            U =     self.__mu_1*r1*r1 
+            U = U + self.__mu_2*r2*r2
             U = -0.5*U
-            U = U - mu1/r1
-            U = U - mu2/r2
+            U = U - self.__mu_1/r1
+            U = U - self.__mu_2/r2
     
-            self.__JC =           - (self.__state_vector[2]*self.__state_vector[2]) 
-            self.__JC = self.__JC - (self.__state_vector[3]*self.__state_vector[3])             
-            self.__JC = self.__JC - (self.__state_vector[4]*self.__state_vector[4])
+            self.__JC =           - (self.__state_vector[3]*self.__state_vector[3]) 
+            self.__JC = self.__JC - (self.__state_vector[4]*self.__state_vector[4])             
+            self.__JC = self.__JC - (self.__state_vector[5]*self.__state_vector[5])
             self.__JC = self.__JC - 2.0*U
 
         return self.__JC

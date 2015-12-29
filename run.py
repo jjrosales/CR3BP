@@ -109,7 +109,7 @@ while time < target_period and continue_flag:
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
  
-#    print DynSys.get_Jacobi_Constant()
+    print time, DynSys.get_Jacobi_Constant()
    
     g.set_x(state_vector)
     g.go()
