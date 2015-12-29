@@ -24,7 +24,7 @@ g = PoincareSections.g_poincare_3d()
 
 DIM           = DynSys.get_dim()
 time          = 0.0
-target_period = 2*6.28
+target_period = 4*6.28
 period        = 0.0
 
 delta_t = 1e-3
@@ -109,7 +109,7 @@ while time < target_period and continue_flag:
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
  
-    print time, DynSys.get_Jacobi_Constant()
+#    print DynSys.get_Jacobi_Constant()
    
     g.set_x(state_vector)
     g.go()
@@ -120,30 +120,30 @@ while time < target_period and continue_flag:
 #        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
 #        time > 1.0):
             
-    if (old_gx*g.get_gx()<0.0):   
-
-        sv_aux = state_vector
-        t_aux  = time
-        
-        delta = 0.0
-
-        while abs(g.get_gx())>x_tol:
-            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
-            DynSys.set_initial_condition(sv_aux)
-            DynSys.set_t0(t_aux)
-            DynSys.set_tf(t_aux+delta)
-
-            DynSys.go()
-            
-            sv_aux = DynSys.get_updated_state_vector()
-            t_aux  = DynSys.get_updated_time()
-
-            g.set_x(sv_aux)
-            g.go()
-        
-        poincare_y   .append(state_vector[1])
-        poincare_ydot.append(state_vector[2])
-        print t_aux, sv_aux
+#    if (old_gx*g.get_gx()<0.0):   
+#
+#        sv_aux = state_vector
+#        t_aux  = time
+#        
+#        delta = 0.0
+#
+#        while abs(g.get_gx())>x_tol:
+#            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
+#            DynSys.set_initial_condition(sv_aux)
+#            DynSys.set_t0(t_aux)
+#            DynSys.set_tf(t_aux+delta)
+#
+#            DynSys.go()
+#            
+#            sv_aux = DynSys.get_updated_state_vector()
+#            t_aux  = DynSys.get_updated_time()
+#
+#            g.set_x(sv_aux)
+#            g.go()
+#        
+#        poincare_y   .append(state_vector[1])
+#        poincare_ydot.append(state_vector[2])
+#        print t_aux, sv_aux
         
 #        continue_flag = False
 
