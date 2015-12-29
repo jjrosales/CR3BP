@@ -24,7 +24,7 @@ g = PoincareSections.g_poincare_3d()
 
 DIM           = DynSys.get_dim()
 time          = 0.0
-target_period = 50.0*6.28
+target_period = 2*6.28
 period        = 0.0
 
 delta_t = 1e-3
@@ -39,24 +39,29 @@ state_x = []
 state_y = []
 state_z = []
 
-state_vector[0] = .9
-state_vector[1] = 1e-1
-state_vector[2] = 5e-4
-state_vector[3] = -1.e-1
-state_vector[4] = 1e-1
-state_vector[5] = -1.2e-3
+#state_vector[0] = 0.9
+#state_vector[1] = 1e-2
+#state_vector[2] = -5e-4
+#state_vector[3] = 4e-1
+#state_vector[4] = 4.459e-1
+#state_vector[5] = -1.2e-6
 
 #
-#state_vector[0] = 0.8
-#state_vector[1] = -0.2
-#state_vector[2] = .8
-#state_vector[3] =  -0.271 
+state_vector[0] = 0.994
+state_vector[1] = 0.0
+state_vector[2] = 0.0
+state_vector[3] = 0.0
+state_vector[4] = -2.0317326295573368357302057924
+state_vector[5] = 0.0
 
 
-p_section = state_vector[0]
+
+p = [0.0, 0.0, 0.0, 0.0]
+
+p_section = p[0]
 
 
-g.set_center(state_vector)
+g.set_center(p)
 g.set_radius(1.25)
 
 #integrates until reaches 'target_period'
@@ -86,8 +91,15 @@ vel_z.append(state_vector[5])
 continue_flag = True
 index         = 0
 
+print state_vector
+
+DynSys.set_initial_condition(state_vector)
+
+print DynSys.get_Jacobi_Constant()
+
 while time < target_period and continue_flag:
-    
+  
+  
     DynSys.set_initial_condition(state_vector)
     DynSys.set_t0(time)
     DynSys.set_tf(time+delta_t)
@@ -96,11 +108,13 @@ while time < target_period and continue_flag:
     
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
-    
+ 
+#    print DynSys.get_Jacobi_Constant()
+   
     g.set_x(state_vector)
     g.go()
     
-#    print DynSys.get_Jacobi_Constant()
+
            
 #    if (old_gx*g.get_gx()<0.0 and
 #        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
@@ -187,7 +201,9 @@ plt.plot(poincare_y, poincare_ydot, '.')
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
-ax.plot(pos_x, pos_y, pos_z)
+ax.plot([-MU], [0.0], [0.0], 'ro')
+ax.plot([1-MU],[0.0], [0.0], 'bo')
+ax.plot(pos_x, pos_y, pos_z, 'g')
 
 plt.show()    
 
