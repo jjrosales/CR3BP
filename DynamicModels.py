@@ -39,6 +39,8 @@ class CRTBP_DynSys:
         self.__intial_condition = np.zeros(self.__dim, dtype=np.double)
         self.__state_vector     = np.zeros(self.__dim, dtype=np.double)
         self.__f_eval           = np.zeros(self.__dim, dtype=np.double)
+
+        self.__L                = np.zeros((5,3), dtype=np.double)
         
         self.__JC = 0.0        
         
@@ -47,6 +49,9 @@ class CRTBP_DynSys:
         
         # numerical intergrator        
         self.__odeint = ode(self.__f).set_integrator('dopri5')
+        
+        # computes libation points
+        print self.__libration_points()
 
     # This method sets the value of the state vector.
     def set_initial_condition(self, cond_ini):
@@ -233,7 +238,122 @@ class CRTBP_DynSys:
         self.__f_eval = state_update
  
         return self.__f_eval
+        
+    # Evaluates the field
+    def __libration_points (self):
+      
+       tol   = 1e-12
+       maxit = 25
+       norm = 999.0
+       i    = 0
+      
+       # Intial Approximations      
+      
+       L1 = (self.__mu/3.)**(1/3.)
+       L2 = L1
+       L3 = 1.0 - (7./12.)*self.__mu
 
+       # Computes L1  
+       while norm > tol:
+           
+           x =     L1*L1*L1*L1*L1
+           x = x - (3.0 - self.__mu)*L1*L1*L1*L1
+           x = x + (3.0 - 2.0*self.__mu)*L1*L1*L1
+           x = x - self.__mu*L1*L1
+           x = x + 2*self.__mu*L1 - self.__mu
+           
+           dx =      5.0*L1*L1*L1*L1
+           dx = dx - 4.0*(3.0 - self.__mu)*L1*L1*L1
+           dx = dx + 3.0*(3.0 - 2.0*self.__mu)*L1*L1
+           dx = dx - 2.0*self.__mu*L1           
+           dx = dx + 2.0*self.__mu
+           
+           norm = abs(x)
+          
+           if norm > tol:
+               dx = x/dx
+               L1 = L1 - dx
+           elif norm >= tol:
+               norm = 999.0
+               i    = 0
+               L1 = self.__mu_1 - L1 
+               break
+           elif i>maxit:
+               print '*WARNING* max. iterations reached to compute fixed points.'
+               
+           i = i + 1
+
+       # Computes L2
+       while norm > tol:
+           
+           x =     L2*L2*L2*L2*L2
+           x = x + (3.0 - self.__mu)*L2*L2*L2*L2
+           x = x + (3.0 - 2.0*self.__mu)*L2*L2*L2
+           x = x - self.__mu*L2*L2
+           x = x - 2*self.__mu*L2 - self.__mu
+           
+           dx =      5.0*L2*L2*L2*L2
+           dx = dx + 4.0*(3.0 - self.__mu)*L2*L2*L2
+           dx = dx + 3.0*(3.0 - 2.0*self.__mu)*L2*L2
+           dx = dx - 2.0*self.__mu*L2
+           dx = dx - 2.0*self.__mu
+           
+           norm = abs(x)
+
+           if norm > tol:
+               dx = x/dx
+               L2 = L2 - dx
+           elif norm >= tol:
+               norm = 999.0
+               i    = 0
+               L2 = self.__mu_1 + L2 
+               break
+           elif i>maxit:
+               print '*WARNING* max. iterations reached to compute fixed points.'
+               
+           i = i + 1
+
+       # Computes L3
+       while norm > tol:
+           
+           x =     L3*L3*L3*L3*L3
+           x = x + (2.0 + self.__mu)*L3*L3*L3*L3
+           x = x + (1.0 + 2.0*self.__mu)*L3*L3*L3
+           x = x - self.__mu_1*L3*L3
+           x = x - 2*self.__mu_1*L3 - self.__mu_1
+           
+           dx =      5.0*L3*L3*L3*L3
+           dx = dx + 4.0*(2.0 + self.__mu)*L3*L3*L3
+           dx = dx + 3.0*(1.0 + 2.0*self.__mu)*L3*L3
+           dx = dx - 2.0*self.__mu_1*L3
+           dx = dx - 2.0*self.__mu_1
+           
+           norm = abs(x)
+
+           if norm > tol:
+               dx = x/dx
+               L3 = L3 - dx
+           elif norm >= tol:
+               norm = 999.0
+               i    = 0
+               L3 = -(self.__mu_2 + L3) 
+               break
+           elif i>maxit:
+               print '*WARNING* max. iterations reached to compute fixed points.'
+               
+           i = i + 1
+
+       # Computes L4 and L5
+       self.__L[0,0] = L1
+       self.__L[1,0] = L2       
+       self.__L[2,0] = L3
+       self.__L[3,0] = 0.5 - self.__mu
+       self.__L[4,0] = self.__L[3,0] 
+       self.__L[3,1] = 0.5*np.sqrt(3.0)
+       self.__L[4,1] = -self.__L[3,1] 
+
+       return self.__L
+       
     
     # Returns 'True' if the class is ready to process the inputs. 'False' otherwise.
     def __is_valid_(self):
