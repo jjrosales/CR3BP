@@ -50,8 +50,8 @@ class CRTBP_DynSys:
         # numerical intergrator        
         self.__odeint = ode(self.__f).set_integrator('dopri5')
         
-        # computes libation points
-        print self.__libration_points()
+        # computes libation points and initalized self.__L
+        self.__libration_points()
 
     # This method sets the value of the state vector.
     def set_initial_condition(self, cond_ini):
@@ -238,6 +238,54 @@ class CRTBP_DynSys:
         self.__f_eval = state_update
  
         return self.__f_eval
+
+    # Evaluates the variationals
+    def __f_var (self, time, state_vector):
+     
+        dim = self.__dim + self.__dim*self.__dim     
+     
+        state_update = np.zeros(dim, dtype=np.double)
+        
+        x_minus_mu1 = state_vector[0] - self.__mu_1
+        x_plus_mu2  = state_vector[0] + self.__mu_2         
+        
+        x_12 = x_plus_mu2  * x_plus_mu2             
+        x_22 = x_minus_mu1 * x_minus_mu1
+        
+        y2   =  state_vector[1] * state_vector[1]
+        z2   =  state_vector[2] * state_vector[2]
+
+        aux  = y2 + z2
+        
+        r2   = aux + x_22
+        r2   = r2*r2*r2
+        r2_3 = self.__mu_2/np.sqrt(r2)
+        
+        r1   = aux + x_12
+        r1   = r1*r1*r1
+        r1_3 = self.__mu_1/np.sqrt(r1)
+
+        state_update[0] = state_vector[3] 
+        
+        state_update[1] = state_vector[4]
+
+        state_update[2] = state_vector[5]
+        
+        state_update[3] =                   2.0*state_vector[4] + state_vector[0]
+        state_update[3] = state_update[3] - x_plus_mu2*r1_3
+        state_update[3] = state_update[3] - x_minus_mu1*r2_3 
+        
+        state_update[4] =                 - 2.0*state_vector[3] + state_vector[1]
+        state_update[4] = state_update[4] - state_vector[1]*r2_3
+        state_update[4] = state_update[4] - state_vector[1]*r1_3 
+        
+        state_update[5] =                 - state_vector[2]*r2_3
+        state_update[5] = state_update[5] - state_vector[2]*r1_3
+
+        self.__f_eval = state_update
+ 
+        return self.__f_eval
+
         
     # Evaluates the field
     def __libration_points (self):
@@ -256,24 +304,23 @@ class CRTBP_DynSys:
        # Computes L1  
        while norm > tol:
            
-           x =     L1*L1*L1*L1*L1
-           x = x - (3.0 - self.__mu)*L1*L1*L1*L1
-           x = x + (3.0 - 2.0*self.__mu)*L1*L1*L1
-           x = x - self.__mu*L1*L1
-           x = x + 2*self.__mu*L1 - self.__mu
+           x =   L1 - (3.0 - self.__mu)
+           x = x*L1 + (3.0 - 2.0*self.__mu)
+           x = x*L1 - self.__mu
+           x = x*L1 + 2.0*self.__mu
+           x = x*L1 - self.__mu
            
-           dx =      5.0*L1*L1*L1*L1
-           dx = dx - 4.0*(3.0 - self.__mu)*L1*L1*L1
-           dx = dx + 3.0*(3.0 - 2.0*self.__mu)*L1*L1
-           dx = dx - 2.0*self.__mu*L1           
-           dx = dx + 2.0*self.__mu
+           dx = 5.0*L1 - 4.0*(3.0 - self.__mu) 
+           dx =  dx*L1 + 3.0*(3.0 - 2.0*self.__mu)
+           dx =  dx*L1 - 2.0*self.__mu
+           dx =  dx*L1 + 2.0*self.__mu
            
            norm = abs(x)
-          
+
            if norm > tol:
                dx = x/dx
                L1 = L1 - dx
-           elif norm >= tol:
+           elif norm <= tol:
                norm = 999.0
                i    = 0
                L1 = self.__mu_1 - L1 
@@ -286,24 +333,24 @@ class CRTBP_DynSys:
        # Computes L2
        while norm > tol:
            
-           x =     L2*L2*L2*L2*L2
-           x = x + (3.0 - self.__mu)*L2*L2*L2*L2
-           x = x + (3.0 - 2.0*self.__mu)*L2*L2*L2
-           x = x - self.__mu*L2*L2
-           x = x - 2*self.__mu*L2 - self.__mu
+           x =   L2 + (3.0 - self.__mu)
+           x = x*L2 + (3.0 - 2.0*self.__mu)
+           x = x*L2 - self.__mu
+           x = x*L2 - 2.0*self.__mu
+           x = x*L2 - self.__mu
            
-           dx =      5.0*L2*L2*L2*L2
-           dx = dx + 4.0*(3.0 - self.__mu)*L2*L2*L2
-           dx = dx + 3.0*(3.0 - 2.0*self.__mu)*L2*L2
-           dx = dx - 2.0*self.__mu*L2
-           dx = dx - 2.0*self.__mu
+           dx = 5.0*L2 + 4.0*(3.0 - self.__mu) 
+           dx =  dx*L2 + 3.0*(3.0 - 2.0*self.__mu)
+           dx =  dx*L2 - 2.0*self.__mu
+           dx =  dx*L2 - 2.0*self.__mu
+           
            
            norm = abs(x)
 
            if norm > tol:
                dx = x/dx
                L2 = L2 - dx
-           elif norm >= tol:
+           elif norm <= tol:
                norm = 999.0
                i    = 0
                L2 = self.__mu_1 + L2 
@@ -315,25 +362,23 @@ class CRTBP_DynSys:
 
        # Computes L3
        while norm > tol:
-           
-           x =     L3*L3*L3*L3*L3
-           x = x + (2.0 + self.__mu)*L3*L3*L3*L3
-           x = x + (1.0 + 2.0*self.__mu)*L3*L3*L3
-           x = x - self.__mu_1*L3*L3
-           x = x - 2*self.__mu_1*L3 - self.__mu_1
-           
-           dx =      5.0*L3*L3*L3*L3
-           dx = dx + 4.0*(2.0 + self.__mu)*L3*L3*L3
-           dx = dx + 3.0*(1.0 + 2.0*self.__mu)*L3*L3
-           dx = dx - 2.0*self.__mu_1*L3
-           dx = dx - 2.0*self.__mu_1
-           
+           x =   L3 + (2.0 + self.__mu)
+           x = x*L3 + (1.0 + 2.0*self.__mu)
+           x = x*L3 - self.__mu_1
+           x = x*L3 - 2.0*self.__mu_1
+           x = x*L3 - self.__mu_1 
+
+           dx = 5.0*L3 + 4.0*(2.0 + self.__mu)
+           dx =  dx*L3 + 3.0*(1.0 + 2.0*self.__mu)
+           dx =  dx*L3 - 2.0*self.__mu_1
+           dx =  dx*L3 - 2.0*self.__mu_1
+                    
            norm = abs(x)
 
            if norm > tol:
                dx = x/dx
                L3 = L3 - dx
-           elif norm >= tol:
+           elif norm <= tol:
                norm = 999.0
                i    = 0
                L3 = -(self.__mu_2 + L3) 
@@ -351,7 +396,7 @@ class CRTBP_DynSys:
        self.__L[4,0] = self.__L[3,0] 
        self.__L[3,1] = 0.5*np.sqrt(3.0)
        self.__L[4,1] = -self.__L[3,1] 
-
+       
        return self.__L
        
     
