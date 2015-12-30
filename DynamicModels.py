@@ -397,6 +397,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
 
         # numerical intergrator        
         self.__odeint = ode(self.__f).set_integrator('dopri5')
+    
 
     # This method sets the variationals
     def set_variationals(self, var_A):
@@ -426,7 +427,9 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
             
             self.state_vector = self.extended_sv[0:self.dim]
             
-#            self.state_vector[0]=self.state_vector[0]+1e-5
+            
+
+            #            self.state_vector[0]=self.state_vector[0]+1e-5
 
 
             self.__exec_ok = self.__odeint.successful()   
@@ -445,15 +448,19 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
     
         self.f_eval = CRTBP_DynSys._CRTBP_DynSys__f(self, time, extended_state_vector[0: self.dim])
         
-        self.Df_eval = self.get_jacobian()
+        self.extended_sv[0:self.dim] = self.f_eval
+        self.extended_sv[self.dim: self.dim_var] = extended_state_vector[self.dim: self.dim_var]
         
-        self.var_eval = np.dot(self.Df_eval, self.variationals_ini)
-        
-        # constructs the extended state vector based upon f and the variational matrix
-        self.extended_sv[0:self.dim] = self.f_eval 
-
-        for i in range(0,self.dim):
-            self.extended_sv[(i+1)*self.dim:(i+2)*self.dim] = self.var_eval[i, 0:self.dim]
+#        print self.extended_sv 
+#        self.Df_eval = self.get_jacobian()
+#        
+#        self.var_eval = np.dot(self.Df_eval, self.variationals_ini)
+#        
+#        # constructs the extended state vector based upon f and the variational matrix
+#        self.extended_sv[0:self.dim] = self.f_eval 
+#
+#        for i in range(0,self.dim):
+#            self.extended_sv[(i+1)*self.dim:(i+2)*self.dim] = self.var_eval[i, 0:self.dim]
         
         return self.extended_sv
         
