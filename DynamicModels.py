@@ -130,19 +130,19 @@ class CRTBP_DynSys(object):
 
         return self.JC
         
-    def get_jacobian(self):
+    def get_jacobian(self, state_vector):
 
             
         J_CRTBP = np.zeros((self.dim, self.dim), dtype=np.double)
         
-        x_minus_mu1 = self.state_vector[0] - self.mu_1
-        x_plus_mu2  = self.state_vector[0] + self.mu_2         
+        x_minus_mu1 = state_vector[0] - self.mu_1
+        x_plus_mu2  = state_vector[0] + self.mu_2         
         
         x_12 = x_plus_mu2  * x_plus_mu2             
         x_22 = x_minus_mu1 * x_minus_mu1
 
-        y2   =  self.state_vector[1] * self.state_vector[1]
-        z2   =  self.state_vector[2] * self.state_vector[2]
+        y2   =  state_vector[1] * state_vector[1]
+        z2   =  state_vector[2] * state_vector[2]
 
         aux  = y2 + z2
         
@@ -153,13 +153,14 @@ class CRTBP_DynSys(object):
         
         r1   = aux + x_12
         r13  = r1*r1*r1
-        r1_3 = self.mu_1/np.sqrt(r1)
+        r1_3 = self.mu_1/np.sqrt(r13)
         r1_5 = r1_3/r1
 
 
         df4_aux = x_minus_mu1*r1_5 + x_plus_mu2*r2_5 
         r1_3_plus_r2_3 = r2_3 + r1_3
         r1_5_plus_r2_5 = r2_5 + r1_5
+
        
         J_CRTBP[0,3] = 1.0
         J_CRTBP[1,4] = 1.0
@@ -168,11 +169,11 @@ class CRTBP_DynSys(object):
         J_CRTBP[3,4] = 2.0
         J_CRTBP[4,3] = -2.0
         
-        J_CRTBP[3,0] = 1 - r1_3_plus_r2_3          
+        J_CRTBP[3,0] = 1.0 - r1_3_plus_r2_3          
         J_CRTBP[3,0] = J_CRTBP[3,0] + 3.0*(r2_5*x_22 + r1_5*x_12) 
         
-        J_CRTBP[3,1] = 3.0*self.state_vector[1] * df4_aux
-        J_CRTBP[3,2] = 3.0*self.state_vector[2] * df4_aux
+        J_CRTBP[3,1] = 3.0*state_vector[1] * df4_aux
+        J_CRTBP[3,2] = 3.0*state_vector[2] * df4_aux
         
         
         J_CRTBP[4,0] = J_CRTBP[3,1]
@@ -180,7 +181,7 @@ class CRTBP_DynSys(object):
         J_CRTBP[4,1] = 1 - r1_3_plus_r2_3           
         J_CRTBP[4,1] = J_CRTBP[4,1] + 3.0*y2*r1_5_plus_r2_5 
         
-        J_CRTBP[4,2] = 3.0*self.state_vector[1]*self.state_vector[2]*r1_5_plus_r2_5
+        J_CRTBP[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
 
         
         J_CRTBP[5,0] = J_CRTBP[3,2]
@@ -410,6 +411,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         self.extended_ini_sv  = np.zeros(self.dim_var, dtype=np.double)
         self.extended_sv      = np.zeros(self.dim_var, dtype=np.double)
 
+        self.extended_sv_eval = np.zeros(self.dim_var, dtype=np.double)
         self.var_eval         = np.eye(self.dim*self.dim, dtype=np.double)
 
         # numerical intergrator        
@@ -444,8 +446,8 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
             
             self.state_vector = self.extended_sv[0:self.dim]
 
-            self.variationals = self.variationals_ini
-
+            for i in range(0,self.dim):
+                self.variationals[i, 0:self.dim] = self.extended_sv[(i+1)*self.dim:(i+2)*self.dim]
 
             self.exec_ok = self.__odeint.successful()   
         else:
@@ -456,22 +458,16 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
     def __f(self, time, extended_state_vector):
     
         self.f_eval = CRTBP_DynSys._CRTBP_DynSys__f(self, time, extended_state_vector[0: self.dim])
-        
-        self.extended_sv[0:self.dim] = self.f_eval
-        self.extended_sv[self.dim: self.dim_var] = extended_state_vector[self.dim: self.dim_var]
-        
-#        print self.extended_sv 
-#        self.Df_eval = self.get_jacobian()
-#        
-#        self.var_eval = np.dot(self.Df_eval, self.variationals_ini)
+       
+        self.Df_eval  = self.get_jacobian(extended_state_vector[0: self.dim])
+        self.var_eval = np.dot(self.Df_eval, self.variationals_ini)
 #        
 #        # constructs the extended state vector based upon f and the variational matrix
-#        self.extended_sv[0:self.dim] = self.f_eval 
-#
-#        for i in range(0,self.dim):
-#            self.extended_sv[(i+1)*self.dim:(i+2)*self.dim] = self.var_eval[i, 0:self.dim]
+        self.extended_sv_eval[0:self.dim] = self.f_eval 
+        for i in range(0,self.dim):
+            self.extended_sv_eval[(i+1)*self.dim:(i+2)*self.dim] = self.var_eval[i, 0:self.dim]
         
-        return self.extended_sv
+        return self.extended_sv_eval
         
     # Returns 'True' if the class is ready to process the inputs. 'False' otherwise.
     def __is_valid_(self):
@@ -505,6 +501,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
 
         self.extended_ini_sv  = np.zeros(self.dim_var, dtype=np.double)
         self.extended_sv      = np.zeros(self.dim_var, dtype=np.double)
+        self.extended_sv_eval = np.zeros(self.dim_var, dtype=np.double)        
 
         self.f_eval           = np.zeros(self.dim, dtype=np.double) # evaluation of the field f
         self.var_eval         = np.eye(self.dim*self.dim, dtype=np.double)
