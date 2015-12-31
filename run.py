@@ -95,15 +95,7 @@ vel_z.append(state_vector[5])
 continue_flag = True
 index         = 0
 
-#print state_vector
-#
-#DynSys.set_initial_condition(state_vector)
-#DynSys.set_t0(time)
-#DynSys.set_tf(time+delta_t)
-#
-#DynSys.go()
-#
-#print DynSys.get_Jacobi_Constant()
+
 
 #DynSys_var.set_initial_condition (state_vector)
 #DynSys_var.set_variationals      (variationals)
@@ -126,6 +118,12 @@ index         = 0
 #state_vector = DynSys.get_updated_state_vector()
 #time         = DynSys.get_updated_time()
 
+DynSys.set_initial_condition (state_vector)
+DynSys.set_variationals  (variationals)    
+
+print state_vector
+print DynSys.get_Jacobi_Constant()
+
 while time < target_period and continue_flag:
   
   
@@ -139,41 +137,53 @@ while time < target_period and continue_flag:
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
  
-    print DynSys.get_exec_flag(), time, state_vector, DynSys.get_Jacobi_Constant()
+#    print DynSys.get_exec_flag(), time, state_vector, DynSys.get_Jacobi_Constant()
+ 
+    f_eval = DynSys.get_f_eval()
+ 
+    DynSys.reset()
+
 #    print DynSys.get_exec_flag()
    
-#    g.set_x(state_vector)
-#    g.go()
+    g.set_x(state_vector)
+    g.go()
     
 
 #    if (old_gx*g.get_gx()<0.0 and
 #        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
 #        time > 1.0):
-            
-#    if (old_gx*g.get_gx()<0.0):   
-#
-#        sv_aux = state_vector
-#        t_aux  = time
-#        
-#        delta = 0.0
-#
-#        while abs(g.get_gx())>x_tol:
-#            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
-#            DynSys.set_initial_condition(sv_aux)
-#            DynSys.set_t0(t_aux)
-#            DynSys.set_tf(t_aux+delta)
-#
-#            DynSys.go()
 #            
-#            sv_aux = DynSys.get_updated_state_vector()
-#            t_aux  = DynSys.get_updated_time()
-#
-#            g.set_x(sv_aux)
-#            g.go()
-#        
-#        poincare_y   .append(state_vector[1])
-#        poincare_ydot.append(state_vector[2])
-#        print t_aux, sv_aux
+    if (old_gx*g.get_gx()<0.0):   
+
+        sv_aux = state_vector
+        t_aux  = time
+        
+        delta = 0.0
+
+        while abs(g.get_gx())>x_tol:
+            delta = -g.get_gx()/np.dot(g.get_Dg(),f_eval)
+            DynSys.set_initial_condition(sv_aux)
+            DynSys.set_variationals(variationals)
+            DynSys.set_t0(t_aux)
+            DynSys.set_tf(t_aux+delta)
+
+#            print delta, t_aux, sv_aux, f_eval, g.get_Dg()
+
+            DynSys.go()
+            
+            sv_aux = DynSys.get_updated_state_vector()
+            t_aux  = DynSys.get_updated_time()
+
+            f_eval = DynSys.get_f_eval()            
+            
+            DynSys.reset()
+
+            g.set_x(sv_aux)
+            g.go()
+        
+        poincare_y   .append(sv_aux[1])
+        poincare_ydot.append(sv_aux[2])
+        print t_aux, sv_aux
         
 #        continue_flag = False
 

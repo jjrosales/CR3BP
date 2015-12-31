@@ -14,7 +14,6 @@ import numpy as np
 from   Constants import *
 from   scipy.integrate import ode
 
-
 # 3D CRTBP
 #        
 
@@ -120,12 +119,12 @@ class CRTBP_DynSys(object):
             U = U - self.mu_1/r1
             U = U - self.mu_2/r2
     
-            self.__JC =           - (self.state_vector[3]*self.state_vector[3]) 
-            self.__JC = self.__JC - (self.state_vector[4]*self.state_vector[4])             
-            self.__JC = self.__JC - (self.state_vector[5]*self.state_vector[5])
-            self.__JC = self.__JC - 2.0*U
+            self.JC =           - (self.state_vector[3]*self.state_vector[3]) 
+            self.JC = self.JC - (self.state_vector[4]*self.state_vector[4])             
+            self.JC = self.JC - (self.state_vector[5]*self.state_vector[5])
+            self.JC = self.JC - 2.0*U
 
-        return self.__JC
+        return self.JC
         
     def get_jacobian(self):
 
@@ -363,6 +362,25 @@ class CRTBP_DynSys(object):
         else:
             self.is_valid = False
         return self.is_valid    
+        
+        
+    def reset(self):
+        self.is_valid        = False
+        self.cond__init_flag = False
+        self.t0_flag         = False
+        self.tf_flag         = False
+        
+        self.exec_ok         = False
+        
+        self.intial_condition = np.zeros(self.dim, dtype=np.double)
+        self.state_vector     = np.zeros(self.dim, dtype=np.double)
+        self.f_eval           = np.zeros(self.dim, dtype=np.double)
+      
+        self.JC = 0.0        
+        
+        self.t0 = 0.0
+        self.tf = 0.0  
+        
     
         
 class CRTBP_variational_DynSys(CRTBP_DynSys):
@@ -380,10 +398,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         self.tf_flag           = False
         
         self.exec_ok           = False
-        
-        self.intial_condition = np.zeros(self.dim, dtype=np.double)
-        self.state_vector     = np.zeros(self.dim, dtype=np.double)
-        
+     
         self.variationals_ini = np.eye(self.dim, dtype=np.double)
         self.variationals     = np.eye(self.dim, dtype=np.double)
 
@@ -391,12 +406,10 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         self.extended_ini_sv  = np.zeros(self.dim_var, dtype=np.double)
         self.extended_sv      = np.zeros(self.dim_var, dtype=np.double)
 
-        self.f_eval           = np.zeros(self.dim, dtype=np.double) # evaluation of the field f
         self.var_eval         = np.eye(self.dim*self.dim, dtype=np.double)
-        self.Df_eval          = np.zeros(self.dim, dtype=np.double) # evaluation of the Jacobian Df
 
         # numerical intergrator        
-        self.__odeint = ode(self.__f).set_integrator('dopri5')
+        self.__odeint = ode(self.__f).set_integrator('dopri5', verbosity=0)
     
 
     # This method sets the variationals
@@ -418,29 +431,17 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
     
             for i in range(0,self.dim):
                 self.extended_ini_sv[(i+1)*self.dim:(i+2)*self.dim] = self.variationals_ini[i, 0:self.dim]
-                
-#            print self.extended_ini_sv
 
             self.__odeint.set_initial_value(self.extended_ini_sv, self.t0)
-#            print self.__odeint.integrate(self.tf)
             self.extended_sv = self.__odeint.integrate(self.tf)
             
             self.state_vector = self.extended_sv[0:self.dim]
-            
-            
 
-            #            self.state_vector[0]=self.state_vector[0]+1e-5
 
 
             self.exec_ok = self.__odeint.successful()   
         else:
-            
             print 'Error integration ODE. Check inputs.'
-           
-#        print self.dim, self.dim_var
-#        print self.L
-#        
-#        print self.t0, self.intial_condition
         
 
     
@@ -475,5 +476,29 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
             self.is_valid = False
         return self.is_valid    
             
+    def reset(self):
         
+        CRTBP_DynSys.reset(self)        
+        
+        self.is_valid          = False
+        self.cond__init_flag   = False
+        self.variationals_flag = False
+        self.t0_flag           = False
+        self.tf_flag           = False
+        
+        self.exec_ok           = False
+        
+        self.intial_condition = np.zeros(self.dim, dtype=np.double)
+        self.state_vector     = np.zeros(self.dim, dtype=np.double)
+        
+        self.variationals_ini = np.eye(self.dim, dtype=np.double)
+        self.variationals     = np.eye(self.dim, dtype=np.double)
+
+
+        self.extended_ini_sv  = np.zeros(self.dim_var, dtype=np.double)
+        self.extended_sv      = np.zeros(self.dim_var, dtype=np.double)
+
+        self.f_eval           = np.zeros(self.dim, dtype=np.double) # evaluation of the field f
+        self.var_eval         = np.eye(self.dim*self.dim, dtype=np.double)
+        self.Df_eval          = np.zeros(self.dim, dtype=np.double) # evaluation of the Jacobian Df        
         
