@@ -151,7 +151,7 @@ class CRTBP_DynSys:
             
             r1   = aux + x_12
             r13  = r1*r1*r1
-            r1_3 = self.__mu_1/np.sqrt(r1)
+            r1_3 = self.__mu_1/np.sqrt(r13)
             r1_5 = r1_3/r1
 
 
