@@ -378,13 +378,13 @@ class CRTBP_DynSys(object):
         self.exec_ok         = False
         
         self.intial_condition = np.zeros(self.dim, dtype=np.double)
-        self.state_vector     = np.zeros(self.dim, dtype=np.double)
+
         self.f_eval           = np.zeros(self.dim, dtype=np.double)
       
         self.JC = 0.0        
         
         self.t0 = 0.0
-        self.tf = 0.0  
+
         
     
         
@@ -428,6 +428,10 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         
     def get_variational_eval(self):
         return self.var_eval
+        
+    def get_f_eval(self, state_vector):
+        self.f_eval = CRTBP_DynSys._CRTBP_DynSys__f(self, 0.0, state_vector)
+        return self.f_eval        
 
     def get_updated_variationals(self):
         return self.variationals
@@ -493,14 +497,10 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         self.exec_ok           = False
         
         self.intial_condition = np.zeros(self.dim, dtype=np.double)
-        self.state_vector     = np.zeros(self.dim, dtype=np.double)
         
         self.variationals_ini = np.eye(self.dim, dtype=np.double)
-        self.variationals     = np.eye(self.dim, dtype=np.double)
-
 
         self.extended_ini_sv  = np.zeros(self.dim_var, dtype=np.double)
-        self.extended_sv      = np.zeros(self.dim_var, dtype=np.double)
         self.extended_sv_eval = np.zeros(self.dim_var, dtype=np.double)        
 
         self.f_eval           = np.zeros(self.dim, dtype=np.double) # evaluation of the field f
