@@ -51,14 +51,14 @@ state_z = []
 #state_vector[5] = -1.2e-6
 
 #
-state_vector[0] = 0.994
-state_vector[1] = 0.0
-state_vector[2] = 0.0
-state_vector[3] = 0.0
-state_vector[4] = -2.0317326295573368357302057924
-state_vector[5] = 0.0
+#state_vector[0] = 0.994
+#state_vector[1] = 0.0
+#state_vector[2] = 0.0
+#state_vector[3] = 0.0
+#state_vector[4] = -2.0317326295573368357302057924
+#state_vector[5] = 0.0
 
-
+state_vector[0:3] = DynSys.get_libration_points()[0]
 
 p = [0.0, 0.0, 0.0, 0.0]
 

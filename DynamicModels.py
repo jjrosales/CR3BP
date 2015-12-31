@@ -91,6 +91,10 @@ class CRTBP_DynSys(object):
             self.__err = -1
         return self.tf
 
+    # Returns the libration points in the form of a 5x3 matrix. The first raw is L1 and so on...
+    def get_libration_points(self):
+        return self.L
+
 
     # Returns the Jacobi Constant
     def get_Jacobi_Constant(self):
