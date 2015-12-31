@@ -34,7 +34,7 @@ class CRTBP_DynSys(object):
         self.t0_flag         = False
         self.tf_flag         = False
         
-        self.__exec_ok         = False
+        self.exec_ok         = False
         
         self.intial_condition = np.zeros(self.dim, dtype=np.double)
         self.state_vector     = np.zeros(self.dim, dtype=np.double)
@@ -78,17 +78,17 @@ class CRTBP_DynSys(object):
            self.__odeint.set_initial_value(self.intial_condition, self.t0)
            self.state_vector = self.__odeint.integrate(self.tf)
 
-           self.__exec_ok = self.__odeint.successful()
+           self.exec_ok = self.__odeint.successful()
 
     # Returns the updated state vector
     def get_updated_state_vector(self):
-        if not self.__exec_ok:
+        if not self.exec_ok:
             self.__err = -1
         return self.state_vector
 
     # Returns the updated time
     def get_updated_time(self):
-        if not self.__exec_ok:
+        if not self.exec_ok:
             self.__err = -1
         return self.tf
 
@@ -188,7 +188,7 @@ class CRTBP_DynSys(object):
         
         
     def get_exec_flag(self):
-        return self.__exec_ok
+        return self.exec_ok
 
     def get_f_eval(self):
         return self.f_eval
@@ -379,7 +379,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         self.t0_flag           = False
         self.tf_flag           = False
         
-        self.__exec_ok         = False
+        self.exec_ok           = False
         
         self.intial_condition = np.zeros(self.dim, dtype=np.double)
         self.state_vector     = np.zeros(self.dim, dtype=np.double)
@@ -432,7 +432,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
             #            self.state_vector[0]=self.state_vector[0]+1e-5
 
 
-            self.__exec_ok = self.__odeint.successful()   
+            self.exec_ok = self.__odeint.successful()   
         else:
             
             print 'Error integration ODE. Check inputs.'
