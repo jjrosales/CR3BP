@@ -426,6 +426,9 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
         
     def get_variational_eval(self):
         return self.var_eval
+
+    def get_updated_variationals(self):
+        return self.variationals
     
     def go(self):
         if self.__is_valid_():
@@ -441,6 +444,7 @@ class CRTBP_variational_DynSys(CRTBP_DynSys):
             
             self.state_vector = self.extended_sv[0:self.dim]
 
+            self.variationals = self.variationals_ini
 
 
             self.exec_ok = self.__odeint.successful()   
