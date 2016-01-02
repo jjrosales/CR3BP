@@ -173,7 +173,7 @@ class CRTBP_DynSys:
            
         J_CRTBP[0,3] = 1.0
         J_CRTBP[1,4] = 1.0
-        J_CRTBP[2,5] = 1.0 * 0
+        J_CRTBP[2,5] = 1.0 
         
         J_CRTBP[3,4] = 2.0
         J_CRTBP[4,3] = -2.0
@@ -191,9 +191,9 @@ class CRTBP_DynSys:
         
         J_CRTBP[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
         
-        J_CRTBP[5,0] = J_CRTBP[3,2] * 0
-        J_CRTBP[5,1] = J_CRTBP[4,2] * 0
-        J_CRTBP[5,2] = (r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5) * 0
+        J_CRTBP[5,0] = J_CRTBP[3,2]
+        J_CRTBP[5,1] = J_CRTBP[4,2]
+        J_CRTBP[5,2] = r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5
  
 #---------------------
 

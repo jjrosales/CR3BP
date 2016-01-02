@@ -56,10 +56,10 @@ state_vector[4]  = -2.0317326295573368357302057924
 state_vector[5]  = 0.0
 state_vector[6]  = 1.0
 state_vector[13] = 1.0
-state_vector[20] = 0.0
+state_vector[20] = 1.0
 state_vector[27] = 1.0
 state_vector[34] = 1.0
-state_vector[41] = 0.0
+state_vector[41] = 1.0
 
 
 p = [0.0, 0.0, 0.0, 0.0]
