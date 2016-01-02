@@ -28,11 +28,14 @@ time          = 0.0
 target_period = 4*6.28
 period        = 0.0
 
-delta_t = 1e-4
+delta_t = 1e-3
 
 old_gx   = 0
 
 state_vector = np.zeros(DIM, dtype=np.double)
+pos_vel      = np.zeros(6, dtype=np.double)
+var          = np.eye(6, dtype=np.double)
+old_var      = np.eye(6, dtype=np.double)
 delta_sv     = np.zeros(DIM, dtype=np.double)
 D_P          = np.zeros((DIM, DIM), dtype=np.double)
 
@@ -40,26 +43,31 @@ state_x = []
 state_y = []
 state_z = []
 
-#state_vector[0] = 0.9
+#state_vector[0] = 0.71
 #state_vector[1] = 1e-2
 #state_vector[2] = -5e-4
 #state_vector[3] = 4e-1
 #state_vector[4] = 4.459e-1
 #state_vector[5] = -1.2e-6
 
-#
-state_vector[0]  = 0.994
-state_vector[1]  = 0.0
-state_vector[2]  = 0.0
-state_vector[3]  = 0.0
-state_vector[4]  = -2.0317326295573368357302057924
-state_vector[5]  = 0.0
+
+state_vector[0]  = 0.1001005021494284e1
+state_vector[4]  = 0.1215976572734674e-2
+
+#state_vector[0]  = 0.994
+#state_vector[1]  = 0.0
+#state_vector[2]  = 0.0
+#state_vector[3]  = 0.0
+#state_vector[4]  = -2.0317326295573368357302057924
+#state_vector[5]  = 0.0
 state_vector[6]  = 1.0
 state_vector[13] = 1.0
 state_vector[20] = 1.0
 state_vector[27] = 1.0
 state_vector[34] = 1.0
 state_vector[41] = 1.0
+
+
 
 
 p = [0.0, 0.0, 0.0, 0.0]
@@ -103,7 +111,8 @@ DynSys.set_initial_condition(state_vector)
 
 print DynSys.get_Jacobi_Constant()
 
-#target_period = 20.0*delta_t
+target_period =10.0*delta_t
+
 
 while time < target_period and continue_flag:
   
@@ -117,10 +126,21 @@ while time < target_period and continue_flag:
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
     
-#    print
-#    print state_vector
+    pos_vel = DynSys.get_updated_pos_vel()
+    var     = DynSys.get_updated_var()
+    
+    d = var - old_var
+
+    print time
+    print state_vector
+#    print var
+#    print old_var
+#    print d
+#    print '--->', np.linalg.det(var)
+#    
+#    old_var = var
  
-    print DynSys.get_Jacobi_Constant()
+#    print DynSys.get_Jacobi_Constant()
    
 #    g.set_x(state_vector)
 #    g.go()

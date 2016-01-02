@@ -14,13 +14,15 @@ __version__ = "$Revision: 1a40d4eaa00b $"
 EARTH_MU = 398600.4418 # km^3/s^2
 
 #Primary Body Mass (kg)
-P1_MASS =  1.98855e30 
+#P1_MASS =  1.98855e30 
 
 #Secondary Body Mass (kg)
-P2_MASS = 5.97219e24 #7.34767309e22
+#P2_MASS = 5.97219e24 #7.34767309e22
 
 # mu mass ratio parameter
-MU =  0.012277471 #  0.0000030359   #1.0/82.314 #P2_MASS / ( P1_MASS + P2_MASS )
+#MU =  0.012277471 #  0.0000030359   #1.0/82.314 #P2_MASS / ( P1_MASS + P2_MASS )
+
+MU = 9.53875e-4
 
 P1_COORD = [-MU, 0.0]
 P2_COORD = [1-MU, 0.0]
