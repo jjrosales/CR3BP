@@ -17,6 +17,7 @@ import PoincareSections
 
 from Constants import *
 
+np.set_printoptions(linewidth = 110)
 
 DynSys = DynamicModels.CRTBP_DynSys(MU)
 g = PoincareSections.g_poincare_3d()
@@ -27,7 +28,7 @@ time          = 0.0
 target_period = 4*6.28
 period        = 0.0
 
-delta_t = 1e-3
+delta_t = 1e-4
 
 old_gx   = 0
 
@@ -47,13 +48,18 @@ state_z = []
 #state_vector[5] = -1.2e-6
 
 #
-state_vector[0] = 0.994
-state_vector[1] = 0.0
-state_vector[2] = 0.0
-state_vector[3] = 0.0
-state_vector[4] = -2.0317326295573368357302057924
-state_vector[5] = 0.0
-
+state_vector[0]  = 0.994
+state_vector[1]  = 0.0
+state_vector[2]  = 0.0
+state_vector[3]  = 0.0
+state_vector[4]  = -2.0317326295573368357302057924
+state_vector[5]  = 0.0
+state_vector[6]  = 1.0
+state_vector[13] = 1.0
+state_vector[20] = 0.0
+state_vector[27] = 1.0
+state_vector[34] = 1.0
+state_vector[41] = 0.0
 
 
 p = [0.0, 0.0, 0.0, 0.0]
@@ -97,6 +103,8 @@ DynSys.set_initial_condition(state_vector)
 
 print DynSys.get_Jacobi_Constant()
 
+#target_period = 20.0*delta_t
+
 while time < target_period and continue_flag:
   
   
@@ -108,42 +116,45 @@ while time < target_period and continue_flag:
     
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
- 
-#    print DynSys.get_Jacobi_Constant()
-   
-    g.set_x(state_vector)
-    g.go()
     
-
-           
-#    if (old_gx*g.get_gx()<0.0 and
-#        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
-#        time > 1.0):
-            
-    if (old_gx*g.get_gx()<0.0):   
-
-        sv_aux = state_vector
-        t_aux  = time
-        
-        delta = 0.0
-
-        while abs(g.get_gx())>x_tol:
-            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
-            DynSys.set_initial_condition(sv_aux)
-            DynSys.set_t0(t_aux)
-            DynSys.set_tf(t_aux+delta)
-
-            DynSys.go()
-            
-            sv_aux = DynSys.get_updated_state_vector()
-            t_aux  = DynSys.get_updated_time()
-
-            g.set_x(sv_aux)
-            g.go()
-        
-        poincare_y   .append(state_vector[1])
-        poincare_ydot.append(state_vector[2])
-        print t_aux, sv_aux
+#    print
+#    print state_vector
+ 
+    print DynSys.get_Jacobi_Constant()
+   
+#    g.set_x(state_vector)
+#    g.go()
+#    
+#
+#           
+##    if (old_gx*g.get_gx()<0.0 and
+##        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
+##        time > 1.0):
+#            
+#    if (old_gx*g.get_gx()<0.0):   
+#
+#        sv_aux = state_vector
+#        t_aux  = time
+#        
+#        delta = 0.0
+#
+#        while abs(g.get_gx())>x_tol:
+#            delta = -g.get_gx()/np.dot(g.get_Dg(), DynSys.get_f_eval())
+#            DynSys.set_initial_condition(sv_aux)
+#            DynSys.set_t0(t_aux)
+#            DynSys.set_tf(t_aux+delta)
+#
+#            DynSys.go()
+#            
+#            sv_aux = DynSys.get_updated_state_vector()
+#            t_aux  = DynSys.get_updated_time()
+#
+#            g.set_x(sv_aux)
+#            g.go()
+#        
+#        poincare_y   .append(state_vector[1])
+#        poincare_ydot.append(state_vector[2])
+#        print t_aux, sv_aux
         
 #        continue_flag = False
 
@@ -154,12 +165,12 @@ while time < target_period and continue_flag:
     vel_y.append(state_vector[4])      
     vel_z.append(state_vector[5])  
     
-    g.set_x(state_vector)
-    g.go()
-    old_gx = g.get_gx()
-                
-    # get period
-    period = DynSys.get_updated_time()
+#    g.set_x(state_vector)
+#    g.go()
+#    old_gx = g.get_gx()
+#                
+#    # get period
+#    period = DynSys.get_updated_time()
      
     #Solve for delta_sv
 
