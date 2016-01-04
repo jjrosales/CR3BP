@@ -41,6 +41,8 @@ class CRTBP_DynSys:
         self._pos_vel          = np.zeros(self._dim_pos_vel, dtype=np.double)
         self._var              = np.eye  (self._dim_pos_vel, dtype=np.double)
         
+        self._jacobian         = np.zeros((self._dim_pos_vel, self._dim_pos_vel), dtype=np.double)  
+        
         self._intial_condition = np.zeros(self._dim, dtype=np.double)
         self._state_vector     = np.zeros(self._dim, dtype=np.double)
         self._f_eval           = np.zeros(self._dim, dtype=np.double)
@@ -86,6 +88,8 @@ class CRTBP_DynSys:
             for i in range(0, self._dim_pos_vel):
                 for j in range(0, self._dim_pos_vel):
                     self._var[i, j] = self._state_vector[(i+1)*self._dim_pos_vel + j]
+                    
+#            self._jacobian = self.__jacobian(self._state_vector)
 
             self._exec_ok = self._odeint.successful()
 
@@ -112,6 +116,12 @@ class CRTBP_DynSys:
         if not self._exec_ok:
             self.__err = -1
         return self._tf
+
+    # Returns the jacobian
+    def get_jacobian(self, state_vector):
+        if not self._exec_ok:
+            self.__err = -1
+        return self.__jacobian(state_vector)
 
     # Returns the libration points in the form of a 5x3 matrix. The first raw is L1 and so on...
     def get_libration_points(self):
@@ -159,13 +169,10 @@ class CRTBP_DynSys:
         
     def get_dim(self):
         return self._dim
+        
+    def __jacobian(self, state_vector):
+      
 
-    # Evaluates the field
-    def __f (self, time, state_vector):
-     
-        state_update = np.zeros(self._dim, dtype=np.double)
-        J_CRTBP      = np.zeros((self._dim, self._dim), dtype=np.double)
- 
         x_minus_mu1 = state_vector[0] - self._mu_1
         x_plus_mu2  = state_vector[0] + self._mu_2         
         
@@ -194,31 +201,61 @@ class CRTBP_DynSys:
 
         # - Compute Jacobian - START
            
-        J_CRTBP[0,3] = 1.0
-        J_CRTBP[1,4] = 1.0
-        J_CRTBP[2,5] = 1.0 
+        self._jacobian[0,3] = 1.0
+        self._jacobian[1,4] = 1.0
+        self._jacobian[2,5] = 1.0 
         
-        J_CRTBP[3,4] = 2.0
-        J_CRTBP[4,3] = -2.0
+        self._jacobian[3,4] = 2.0
+        self._jacobian[4,3] = -2.0
         
-        J_CRTBP[3,0] = 1.0 - r1_3_plus_r2_3          
-        J_CRTBP[3,0] = J_CRTBP[3,0] + 3.0*(r2_5*x_22 + r1_5*x_12) 
+        self._jacobian[3,0] = 1.0 - r1_3_plus_r2_3          
+        self._jacobian[3,0] = self._jacobian[3,0] + 3.0*(r2_5*x_22 + r1_5*x_12) 
         
-        J_CRTBP[3,1] = 3.0*state_vector[1] * df4_aux
-        J_CRTBP[3,2] = 3.0*state_vector[2] * df4_aux
+        self._jacobian[3,1] = 3.0*state_vector[1] * df4_aux
+        self._jacobian[3,2] = 3.0*state_vector[2] * df4_aux
                 
-        J_CRTBP[4,0] = J_CRTBP[3,1]
+        self._jacobian[4,0] = self._jacobian[3,1]
         
-        J_CRTBP[4,1] = 1.0 - r1_3_plus_r2_3           
-        J_CRTBP[4,1] = J_CRTBP[4,1] + 3.0*y2*r1_5_plus_r2_5 
+        self._jacobian[4,1] = 1.0 - r1_3_plus_r2_3           
+        self._jacobian[4,1] = self._jacobian[4,1] + 3.0*y2*r1_5_plus_r2_5 
         
-        J_CRTBP[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
+        self._jacobian[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
         
-        J_CRTBP[5,0] = J_CRTBP[3,2]
-        J_CRTBP[5,1] = J_CRTBP[4,2]
-        J_CRTBP[5,2] = r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5
+        self._jacobian[5,0] = self._jacobian[3,2]
+        self._jacobian[5,1] = self._jacobian[4,2]
+        self._jacobian[5,2] = r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5
+
+        return self._jacobian 
+
+    # Evaluates the field
+    def __f (self, time, state_vector):
+             
+        state_update = np.zeros(self._dim, dtype=np.double)
+        J_CRTBP      = np.zeros((self._dim_pos_vel, self._dim_pos_vel), dtype=np.double)
+
+        x_minus_mu1 = state_vector[0] - self._mu_1
+        x_plus_mu2  = state_vector[0] + self._mu_2         
         
- 
+        x_12 = x_plus_mu2  * x_plus_mu2             
+        x_22 = x_minus_mu1 * x_minus_mu1
+        
+        y2   =  state_vector[1] * state_vector[1]
+        z2   =  state_vector[2] * state_vector[2]
+
+        aux  = y2 + z2
+        
+        r2   = aux + x_22
+        r23  = r2*r2*r2
+        r2_3 = self._mu_2/np.sqrt(r23)
+        
+        r1   = aux + x_12
+        r13  = r1*r1*r1
+        r1_3 = self._mu_1/np.sqrt(r13)
+
+        # - Compute Jacobian - START
+           
+        J_CRTBP = self.__jacobian(state_vector)
+
         # - Compute Jacobian - END
 
         state_update[0]  = state_vector[3] 
