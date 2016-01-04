@@ -50,16 +50,16 @@ state_z = []
 #state_vector[4] = 4.459e-1
 #state_vector[5] = -1.2e-6
 
+#
+#state_vector[0]  = 0.1001005021494284e1
+#state_vector[4]  = 0.1215976572734674e-2
 
-state_vector[0]  = 0.1001005021494284e1
-state_vector[4]  = 0.1215976572734674e-2
-
-#state_vector[0]  = 0.994
-#state_vector[1]  = 0.0
-#state_vector[2]  = 0.0
-#state_vector[3]  = 0.0
-#state_vector[4]  = -2.0317326295573368357302057924
-#state_vector[5]  = 0.0
+state_vector[0]  = 0.994
+state_vector[1]  = 0.0
+state_vector[2]  = 0.0
+state_vector[3]  = 0.0
+state_vector[4]  = -2.0317326295573368357302057924
+state_vector[5]  = 0.0
 state_vector[6]  = 1.0
 state_vector[13] = 1.0
 state_vector[20] = 1.0
@@ -111,7 +111,7 @@ DynSys.set_initial_condition(state_vector)
 
 print DynSys.get_Jacobi_Constant()
 
-target_period =10.0*delta_t
+#target_period =10.0*delta_t
 
 
 while time < target_period and continue_flag:
