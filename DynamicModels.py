@@ -201,6 +201,8 @@ class CRTBP_DynSys:
 
         # - Compute Jacobian - START
            
+        self._jacobian = np.zeros((self._dim_pos_vel, self._dim_pos_vel), dtype=np.double)           
+           
         self._jacobian[0,3] = 1.0
         self._jacobian[1,4] = 1.0
         self._jacobian[2,5] = 1.0 
@@ -223,7 +225,7 @@ class CRTBP_DynSys:
         
         self._jacobian[5,0] = self._jacobian[3,2]
         self._jacobian[5,1] = self._jacobian[4,2]
-        self._jacobian[5,2] = r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5
+        self._jacobian[5,2] = -r1_3_plus_r2_3 + 3.0*z2*r1_5_plus_r2_5
 
         return self._jacobian 
 
