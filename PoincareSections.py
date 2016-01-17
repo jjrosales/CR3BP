@@ -73,7 +73,7 @@ class g_poincare_3d:
 
     def __init__(self):
 
-        self.__dim = 6
+        self.__dim = 42
         
         self.__c  = np.zeros(self.__dim, dtype=np.double)
         self.__x  = np.zeros(self.__dim, dtype=np.double)
@@ -100,8 +100,9 @@ class g_poincare_3d:
 
     # This method sets the intial time.
     def go(self):
-        self.__eval = self.__x[0] - self.__c[0]
-        self.__dg   = [1.0, 0.0 ,0.0, 0.0, 0.0, 0.0] 
+        
+        self.__eval = self.__x[1] - self.__c[0]
+        self.__dg[1] = 1.0 #   = [0.0, 1.0 ,0.0, 0.0, 0.0, 0.0] 
 
     def get_center(self):
         return self.__c  
