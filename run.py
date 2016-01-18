@@ -14,6 +14,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.integrate import ode
 import DynamicModels
 import PoincareSections
+from Lyapunov_seed import * 
 
 from Constants import *
 
@@ -68,9 +69,9 @@ state_z = []
 
 #delta_x = 1e-3*[np.cos()]
 
-j = 0
+L_i = DynSys.get_libration_points()[2][0]
 
-state_vector[0]  = DynSys.get_libration_points()[j][0]
+state_vector[0]  = L_i
 state_vector[1]  = 0.0
 state_vector[2]  = 0.0
 state_vector[3]  = 0.0
@@ -91,16 +92,7 @@ p_section = 0.0*p
 g.set_center(p_section)
 g.set_radius(1.25)
 
-
-#integrates until reaches 'target_period'
-
-radius = g.get_radius()
 x_tol = 1e-12
-
-
-poincare_y    = []
-poincare_ydot = []
-
 
 pos_x = []
 pos_y = []
@@ -108,64 +100,23 @@ pos_z = []
 vel_x = []
 vel_y = []
 vel_z = []
-
-#pos_x.append(state_vector[0])     
-#pos_y.append(state_vector[1])   
-#pos_z.append(state_vector[2])   
-#vel_x.append(state_vector[3])     
-#vel_y.append(state_vector[4])      
-#vel_z.append(state_vector[5])      
-
+   
 continue_flag = True
 index         = 0
 
-print state_vector
-
-DynSys.set_initial_condition(state_vector)
-
 print DynSys.get_Jacobi_Constant()
-print DynSys.get_jacobian(state_vector)
 
-#for i in range(0,6):
-i = 2
-lambda_ = np.linalg.eig(DynSys.get_jacobian(state_vector))[0]
-eigenv  = np.linalg.eig(DynSys.get_jacobian(state_vector))[1]
-eigenv  = np.transpose(eigenv)
+# Given an amplitude, computes the seed to initialize the differential
+# corrector to compute Lyapunov periodic orbits
 
-print eigenv
-
-u1 = eigenv[0]
-u1 = u1/u1[0]
-
-u2 = eigenv[1]
-u2 = u2/u2[0]
-
-w1 = eigenv[2]
-w1 = w1/w1[0]
-
-w2 = eigenv[3]
-w2 = w2/w2[0]
-
-#print u1
-#print u2
-#print w1.real
-#print w2.real
-
-beta = .001
-
-state_vector[0:6] = 2.0*beta*w1.real
-state_vector[0] = state_vector[0] + DynSys.get_libration_points()[j][0]
-state_vector[1] = 0.0
-state_vector[2] = 0.0
-state_vector[3] = 0.0
-state_vector[5] = 0.0
+state_vector[0:6] = Lyapunov_seed(1e-5, MU, L_i)
 
 print state_vector
 
 DynSys.set_initial_condition(state_vector)
 print DynSys.get_Jacobi_Constant()
 
-target_period = 5000*delta_t
+target_period = 15000*delta_t
 
 while abs(time) < target_period and continue_flag:
   
@@ -187,28 +138,9 @@ while abs(time) < target_period and continue_flag:
     
     pos_vel = DynSys.get_updated_pos_vel()
     var     = DynSys.get_updated_var()
-#    
-#    d = var - old_var
 
-#    print time
-#    print state_vector
     time = time + delta_t
 
-    print time, state_vector
-
-##    
-#    print DynSys.get_jacobian(state_vector)
-#
-#    print np.linalg.eig(DynSys.get_jacobian(state_vector))
-
-#    print var
-#    print old_var
-#    print d
-#    print '--->', np.linalg.det(var)
-#    
-#    old_var = var
- 
-#    print DynSys.get_Jacobi_Constant()
    
     g.set_x(state_vector)
     g.go()
@@ -254,8 +186,8 @@ while abs(time) < target_period and continue_flag:
 
 
     
-#    g.set_x(state_vector)
-#    g.go()
+    g.set_x(state_vector)
+    g.go()
     old_gx = g.get_gx()
 #                
 #    # get period
@@ -288,6 +220,7 @@ plt.plot(-MU, 0, 'ro')
 plt.plot(1-MU, 0, 'bo')
 plt.plot(DynSys.get_libration_points()[0][0], 0, 'r*')
 plt.plot(DynSys.get_libration_points()[1][0], 0, 'r*')
+plt.plot(DynSys.get_libration_points()[2][0], 0, 'r*')
    
 plt.figure(1)
 #plt.plot([p_section, p_section], [-1, 1])
@@ -310,49 +243,3 @@ ax.plot(pos_x, pos_y, pos_z, 'g')
 
 plt.show()    
 
-
-##
-#target_period = 5.0 * period
-#time = 0.0
-#
-#while time <= target_period:
-#
-#    
-#    DynSys.set_initial_condition(state_vector)
-#    DynSys.set_t0(time)
-#    DynSys.set_tf(time+delta_t)
-#
-#    DynSys.go()
-#    
-#    state_vector = DynSys.get_updated_state_vector()
-#    time         = DynSys.get_updated_time()
-#    
-#    pos_x.append(state_vector[0])     
-#    pos_y.append(state_vector[1])    
-#    vel_x.append(state_vector[2])     
-#    vel_y.append(state_vector[3])
-# 
-#
-#print '**** time *****', time   
-##
-##    # plotting
-##
-#    
-#plt.annotate('P1', xy=(-MU, 0), xytext=(-MU, -.1))
-#plt.annotate('P2', xy=(-MU, 0), xytext=(1-MU, -.1))
-#plt.plot(-MU, 0, 'ro')
-#plt.plot(1-MU, 0, 'bo')
-##
-##
-#plt.figure(1)
-#plt.plot([p_section, p_section], [-1, 1])
-#plt.plot(pos_x, pos_y)
-##
-#plt.figure(2)  
-#plt.plot(vel_x, vel_y)    
-##
-#plt.show()
-
-
-    
-    
