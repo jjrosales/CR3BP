@@ -29,7 +29,7 @@ time          = 0.0
 target_period = 4*6.28
 period        = 0.0
 
-delta_t = 1e-3
+delta_t = 1e-4
 gamma = 1e-3
 
 old_gx   = 0
@@ -41,41 +41,13 @@ old_var      = np.eye(6, dtype=np.double)
 delta_sv     = np.zeros(DIM, dtype=np.double)
 D_P          = np.zeros((DIM, DIM), dtype=np.double)
 
-state_x = []
-state_y = []
-state_z = []
-
-#state_vector[0] = 0.71
-#state_vector[1] = 1e-2
-#state_vector[2] = -5e-4
-#state_vector[3] = 4e-1
-#state_vector[4] = 4.459e-1
-#state_vector[5] = -1.2e-6
-
-#
-#state_vector[0]  = 0.1001005021494284e1
-#state_vector[4]  = 0.1215976572734674e-2
-
-#state_vector[0]  = 0.994
-#state_vector[1]  = 0.0
-#state_vector[2]  = 0.0
-#state_vector[3]  = 0.0
-#state_vector[4]  = -2.0317326295573368357302057924
-#state_vector[5]  = 0.0
-
-#3.23879125e-001 +0.00000000e+00j,  -3.23879125e-001 +0.00000000e+00j,
-#         -1.27850912e-001 -4.66300886e-18j,  -1.27850912e-001 +4.66300886e-18j,
-#         -2.05063327e-043 -2.22976781e-59j,  -2.05063327e-043 +2.22976781e-59j
-
-#delta_x = 1e-3*[np.cos()]
-
-L_i = DynSys.get_libration_points()[2][0]
+L_i = DynSys.get_libration_points()[0][0]
 
 state_vector[0]  = L_i
 state_vector[1]  = 0.0
 state_vector[2]  = 0.0
 state_vector[3]  = 0.0
-state_vector[4]  = 0.0 #-2.0317326295573368357302057924
+state_vector[4]  = 0.0 
 state_vector[5]  = 0.0
 state_vector[6]  = 1.0
 state_vector[13] = 1.0
@@ -100,6 +72,9 @@ pos_z = []
 vel_x = []
 vel_y = []
 vel_z = []
+
+poincare_y    = []
+poincare_ydot = []
    
 continue_flag = True
 index         = 0
@@ -109,16 +84,18 @@ print DynSys.get_Jacobi_Constant()
 # Given an amplitude, computes the seed to initialize the differential
 # corrector to compute Lyapunov periodic orbits
 
-state_vector[0:6] = Lyapunov_seed(1e-5, MU, L_i)
+state_vector[0:6] = Lyapunov_seed(2e-5, MU, L_i)
 
 print state_vector
 
 DynSys.set_initial_condition(state_vector)
 print DynSys.get_Jacobi_Constant()
 
-target_period = 15000*delta_t
+target_period = 100000*delta_t
 
 while abs(time) < target_period and continue_flag:
+
+    # Integrate the equations of motion and the variational equations
   
     pos_x.append(state_vector[0])     
     pos_y.append(state_vector[1])   
@@ -141,14 +118,13 @@ while abs(time) < target_period and continue_flag:
 
     time = time + delta_t
 
+    print time, pos_vel   
    
     g.set_x(state_vector)
     g.go()
     
-      
-#    if (old_gx*g.get_gx()<0.0 and
-#        np.linalg.norm(abs(state_vector-g.get_center()))<radius and
-#        time > 1.0):
+
+    # Poincare Map computation
             
     if (old_gx*g.get_gx()<0.0):   
 
@@ -214,16 +190,17 @@ while abs(time) < target_period and continue_flag:
                 
     # plotting
     
-plt.annotate('P1', xy=(-MU, 0), xytext=(-MU, -.1))
-plt.annotate('P2', xy=(-MU, 0), xytext=(1-MU, -.1))
-plt.plot(-MU, 0, 'ro')
-plt.plot(1-MU, 0, 'bo')
-plt.plot(DynSys.get_libration_points()[0][0], 0, 'r*')
-plt.plot(DynSys.get_libration_points()[1][0], 0, 'r*')
-plt.plot(DynSys.get_libration_points()[2][0], 0, 'r*')
+#plt.annotate('P1', xy=(-MU, 0), xytext=(-MU, -.1))
+#plt.annotate('P2', xy=(-MU, 0), xytext=(1-MU, -.1))
+#plt.plot(-MU, 0, 'ro')
+#plt.plot(1-MU, 0, 'bo')
+#plt.plot(DynSys.get_libration_points()[0][0], 0, 'r*')
+#plt.plot(DynSys.get_libration_points()[1][0], 0, 'r*')
+#plt.plot(DynSys.get_libration_points()[2][0], 0, 'r*')
    
 plt.figure(1)
 #plt.plot([p_section, p_section], [-1, 1])
+plt.plot(L_i, 0, 'r*')
 plt.plot(pos_x, pos_y)
 #plt.plot(pos_x[-1], pos_y[-1], 'go')
 
