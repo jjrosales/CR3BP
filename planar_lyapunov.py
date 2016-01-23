@@ -29,11 +29,11 @@ class planar_lyapunov:
         
         self._index = 0
         
-        self._tol_correction = 1e-15
+        self._tol_correction = 1e-12
 
-        self._tol_section = 1e-17
+        self._tol_section = 1e-12
 
-        self._dt  = 1e-3 
+        self._dt  = 1e-3
         
         self._time  = 0.0  
         
@@ -49,27 +49,24 @@ class planar_lyapunov:
         
         state_aux1 = np.zeros(6, dtype=np.double)
         state_aux2 = np.zeros(6, dtype=np.double)
-        state_aux3 = np.zeros(6, dtype=np.double)
 
         aux = np.zeros(6, dtype=np.double)
+
+        state_aux1 = self.continuation_step(self.Lyapunov_seed(5e-4))        
+        state_aux2 = self.continuation_step(self.Lyapunov_seed(1e-3))
         
-        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-4))
-        state_aux2 = self.continuation_step(self.Lyapunov_seed(2e-4))
-        state_aux3 = 2.0*state_aux2 - state_aux1
-
-        print state_aux1[0], state_aux1[4] 
-        print state_aux2[0]-state_aux1[0], state_aux2[4] 
-        print state_aux3[0]-state_aux2[0], state_aux3[4] 
-
-        for i in range(0,60):
-            state_aux3 = self.continuation_step(state_aux3)
-            aux        = 2.0*state_aux3 - state_aux2   
-            state_aux2 = state_aux3
-            state_aux3 = aux
+        aux        = 2.0*state_aux2 - state_aux1
+        
+        for i in range(0,50):
+            state_aux1 = state_aux2
+            state_aux2 = self.continuation_step(aux)
+            aux        = 2.0*state_aux2 - state_aux1
             
-            print i, state_aux3 
+            print i, state_aux2
 
-        self._ini_state[0:6] = state_aux3[0:6]
+
+
+        self._ini_state[0:6] = state_aux2
         print self._ini_state[0:6]
 
         
@@ -163,7 +160,9 @@ class planar_lyapunov:
                
                 old_y = state_vector[1]  
 
-
+        if abs(self._time) >= self._max_time:
+            print "** ERROR: orbit did not cross x-axis **"
+            exit 
         return ini_state[0:6]
                 
     def get_state_ini(self):

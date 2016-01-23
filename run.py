@@ -167,12 +167,12 @@ index         = 0
 planar_lyapunov_po.set_amplitude(1e-4) 
 planar_lyapunov_po.go()
 ini_state_vector[0:6] = planar_lyapunov_po.get_state_ini()
-ini_state_vector[6]  = 1.0
-ini_state_vector[13] = 1.0
-ini_state_vector[20] = 1.0
-ini_state_vector[27] = 1.0
-ini_state_vector[34] = 1.0
-ini_state_vector[41] = 1.0
+ini_state_vector[6]   = 1.0
+ini_state_vector[13]  = 1.0
+ini_state_vector[20]  = 1.0
+ini_state_vector[27]  = 1.0
+ini_state_vector[34]  = 1.0
+ini_state_vector[41]  = 1.0
         
 T_period = planar_lyapunov_po.get_period()
 
@@ -204,6 +204,7 @@ while abs(time) <= T_period:
     state_vector = DynSys.get_updated_state_vector()
     time         = DynSys.get_updated_time()
 
+#    print time, state_vector
 
 plt.figure(1)
 plt.plot(L_i, 0, 'r*')
