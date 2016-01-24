@@ -42,9 +42,11 @@ old_var          = np.eye(6, dtype=np.double)
 delta_sv         = np.zeros(DIM, dtype=np.double)
 D_P              = np.zeros((DIM, DIM), dtype=np.double)
 
-L_i = DynSys.get_libration_points()[0][0]
+i = 1
 
-planar_lyapunov_po =  planar_lyapunov.planar_lyapunov(DynSys, 1)
+L_i = DynSys.get_libration_points()[i][0]
+
+planar_lyapunov_po =  planar_lyapunov.planar_lyapunov(DynSys, i+1)
 
 ini_state_vector[0]  = L_i
 ini_state_vector[1]  = 0.0

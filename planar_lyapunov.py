@@ -52,17 +52,17 @@ class planar_lyapunov:
 
         aux = np.zeros(6, dtype=np.double)
 
-        state_aux1 = self.continuation_step(self.Lyapunov_seed(5e-4))        
-        state_aux2 = self.continuation_step(self.Lyapunov_seed(1e-3))
+        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-5))        
+        state_aux2 = self.continuation_step(self.Lyapunov_seed(5e-3))
         
         aux        = 2.0*state_aux2 - state_aux1
         
-        for i in range(0,50):
+        for i in range(0,5):
             state_aux1 = state_aux2
             state_aux2 = self.continuation_step(aux)
             aux        = 2.0*state_aux2 - state_aux1
             
-            print i, state_aux2
+            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
 
 
 
@@ -175,7 +175,7 @@ class planar_lyapunov:
     def Lyapunov_seed(self, amplitude):
         
         seed_state_vector = np.zeros(6, dtype=np.double)
-       
+    
         L_plus_mu = self._L_i_x_coord + self._mu
         mu_bar = L_plus_mu - 1.0
         mu_bar = self._mu / (mu_bar*mu_bar*mu_bar)
