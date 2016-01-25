@@ -178,7 +178,7 @@ class planar_lyapunov:
     
         L_plus_mu = self._L_i_x_coord + self._mu
         mu_bar = L_plus_mu - 1.0
-        mu_bar = self._mu / (mu_bar*mu_bar*mu_bar)
+        mu_bar = self._mu / abs(mu_bar*mu_bar*mu_bar)
         mu_bar = mu_bar + (1.0 - self._mu) * 1.0/abs(L_plus_mu*L_plus_mu*L_plus_mu)
         
         nu = (9.0*mu_bar - 8.0)*mu_bar
