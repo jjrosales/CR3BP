@@ -225,7 +225,7 @@ class CRTBP_DynSys:
         self._jacobian[4,0] = self._jacobian[3,1]
         
         self._jacobian[4,1] = 1.0 - r1_3_plus_r2_3           
-        self._jacobian[4,1] = self._jacobian[4,1] - 3.0*y2*r1_5_plus_r2_5 
+        self._jacobian[4,1] = self._jacobian[4,1] + 3.0*y2*r1_5_plus_r2_5 ###
         
         self._jacobian[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
         
