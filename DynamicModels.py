@@ -321,8 +321,8 @@ class CRTBP_DynSys:
         state_update[36] = J_CRTBP[3,0]*state_vector[39] + J_CRTBP[4,0]*state_vector[40] + J_CRTBP[5,0]*state_vector[41]
         state_update[37] = J_CRTBP[3,1]*state_vector[39] + J_CRTBP[4,1]*state_vector[40] + J_CRTBP[5,1]*state_vector[41]
         state_update[38] = J_CRTBP[3,2]*state_vector[39] + J_CRTBP[4,2]*state_vector[40] + J_CRTBP[5,2]*state_vector[41]
-        state_update[39] = state_vector[36] - 2.0*state_vector[39]
-        state_update[40] = state_vector[37] + 2.0*state_vector[40]
+        state_update[39] = state_vector[36] - 2.0*state_vector[40]
+        state_update[40] = state_vector[37] + 2.0*state_vector[39]
         state_update[41] = state_vector[38]
         
         self._f_eval = state_update
