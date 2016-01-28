@@ -112,12 +112,12 @@ class planar_lyapunov:
                 self._model.go()
                 
                 state_vector = self._model.get_updated_state_vector()
-                time         = self._model.get_updated_time()
+                self._time   = self._model.get_updated_time()
                 
                 pos_vel = self._model.get_updated_pos_vel()
                 var     = self._model.get_updated_var()
             
-                self._time = self._time + self._dt
+#                self._time = self._time + self._dt
                    
                 # Poincare Map computation. The section is y = 0
                 y_coord = state_vector[1]
@@ -125,7 +125,7 @@ class planar_lyapunov:
                 if (old_y*y_coord<0.0):   
             
                     sv_aux = state_vector
-                    t_aux  = time
+                    t_aux  = self._time
                     
                     delta = 0.0
             
