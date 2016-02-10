@@ -208,7 +208,7 @@ class CRTBP_DynSys:
         r1_5 = r1_3/r1
 
 
-        df4_aux = x_minus_mu1*r1_5 + x_plus_mu2*r2_5 
+        df4_aux = x_minus_mu1*r2_5 + x_plus_mu2*r1_5 
         r1_3_plus_r2_3 = r2_3 + r1_3
         r1_5_plus_r2_5 = r2_5 + r1_5
 
@@ -232,7 +232,7 @@ class CRTBP_DynSys:
         self._jacobian[4,0] = self._jacobian[3,1]
         
         self._jacobian[4,1] = 1.0 - r1_3_plus_r2_3           
-        self._jacobian[4,1] = self._jacobian[4,1] + 3.0*y2*r1_5_plus_r2_5 ###
+        self._jacobian[4,1] = self._jacobian[4,1] + 3.0*y2*r1_5_plus_r2_5
         
         self._jacobian[4,2] = 3.0*state_vector[1]*state_vector[2]*r1_5_plus_r2_5
         
