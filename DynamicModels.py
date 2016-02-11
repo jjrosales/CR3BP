@@ -290,47 +290,57 @@ class CRTBP_DynSys:
         state_update[5]  =                 - state_vector[2]*r2_3
         state_update[5]  = state_update[5] - state_vector[2]*r1_3
         
-        state_update[6]  = J_CRTBP[3,0]*state_vector[9] + J_CRTBP[4,0]*state_vector[10] + J_CRTBP[5,0]*state_vector[11]
-        state_update[7]  = J_CRTBP[3,1]*state_vector[9] + J_CRTBP[4,1]*state_vector[10] + J_CRTBP[5,1]*state_vector[11]
-        state_update[8]  = J_CRTBP[3,2]*state_vector[9] + J_CRTBP[4,2]*state_vector[10] + J_CRTBP[5,2]*state_vector[11]
-        state_update[9]  = state_vector[6] - 2.0*state_vector[10]
-        state_update[10] = state_vector[7] + 2.0*state_vector[9]
-        state_update[11] = state_vector[8]
-
-        state_update[12] = J_CRTBP[3,0]*state_vector[15] + J_CRTBP[4,0]*state_vector[16] + J_CRTBP[5,0]*state_vector[17]
-        state_update[13] = J_CRTBP[3,1]*state_vector[15] + J_CRTBP[4,1]*state_vector[16] + J_CRTBP[5,1]*state_vector[17]
-        state_update[14] = J_CRTBP[3,2]*state_vector[15] + J_CRTBP[4,2]*state_vector[16] + J_CRTBP[5,2]*state_vector[17]
-        state_update[15] = state_vector[12] - 2.0*state_vector[16]
-        state_update[16] = state_vector[13] + 2.0*state_vector[15]
-        state_update[17] = state_vector[14]
-
-        state_update[18] = J_CRTBP[3,0]*state_vector[21] + J_CRTBP[4,0]*state_vector[22] + J_CRTBP[5,0]*state_vector[23]
-        state_update[19] = J_CRTBP[3,1]*state_vector[21] + J_CRTBP[4,1]*state_vector[22] + J_CRTBP[5,1]*state_vector[23]
-        state_update[20] = J_CRTBP[3,2]*state_vector[21] + J_CRTBP[4,2]*state_vector[22] + J_CRTBP[5,2]*state_vector[23]
-        state_update[21] = state_vector[18] - 2.0*state_vector[22]
-        state_update[22] = state_vector[19] + 2.0*state_vector[21]
-        state_update[23] = state_vector[20]
-
-        state_update[24] = J_CRTBP[3,0]*state_vector[27] + J_CRTBP[4,0]*state_vector[28] + J_CRTBP[5,0]*state_vector[29]
-        state_update[25] = J_CRTBP[3,1]*state_vector[27] + J_CRTBP[4,1]*state_vector[28] + J_CRTBP[5,1]*state_vector[29]
-        state_update[26] = J_CRTBP[3,2]*state_vector[27] + J_CRTBP[4,2]*state_vector[28] + J_CRTBP[5,2]*state_vector[29]
-        state_update[27] = state_vector[24] - 2.0*state_vector[28]
-        state_update[28] = state_vector[25] + 2.0*state_vector[27]
-        state_update[29] = state_vector[26]
+#        state_update[6]  = J_CRTBP[3,0]*state_vector[9] + J_CRTBP[4,0]*state_vector[10] + J_CRTBP[5,0]*state_vector[11]
+#        state_update[7]  = J_CRTBP[3,1]*state_vector[9] + J_CRTBP[4,1]*state_vector[10] + J_CRTBP[5,1]*state_vector[11]
+#        state_update[8]  = J_CRTBP[3,2]*state_vector[9] + J_CRTBP[4,2]*state_vector[10] + J_CRTBP[5,2]*state_vector[11]
+#        state_update[9]  = state_vector[6] - 2.0*state_vector[10]
+#        state_update[10] = state_vector[7] + 2.0*state_vector[9]
+#        state_update[11] = state_vector[8]
+#
+#        state_update[12] = J_CRTBP[3,0]*state_vector[15] + J_CRTBP[4,0]*state_vector[16] + J_CRTBP[5,0]*state_vector[17]
+#        state_update[13] = J_CRTBP[3,1]*state_vector[15] + J_CRTBP[4,1]*state_vector[16] + J_CRTBP[5,1]*state_vector[17]
+#        state_update[14] = J_CRTBP[3,2]*state_vector[15] + J_CRTBP[4,2]*state_vector[16] + J_CRTBP[5,2]*state_vector[17]
+#        state_update[15] = state_vector[12] - 2.0*state_vector[16]
+#        state_update[16] = state_vector[13] + 2.0*state_vector[15]
+#        state_update[17] = state_vector[14]
+#
+#        state_update[18] = J_CRTBP[3,0]*state_vector[21] + J_CRTBP[4,0]*state_vector[22] + J_CRTBP[5,0]*state_vector[23]
+#        state_update[19] = J_CRTBP[3,1]*state_vector[21] + J_CRTBP[4,1]*state_vector[22] + J_CRTBP[5,1]*state_vector[23]
+#        state_update[20] = J_CRTBP[3,2]*state_vector[21] + J_CRTBP[4,2]*state_vector[22] + J_CRTBP[5,2]*state_vector[23]
+#        state_update[21] = state_vector[18] - 2.0*state_vector[22]
+#        state_update[22] = state_vector[19] + 2.0*state_vector[21]
+#        state_update[23] = state_vector[20]
+#
+#        state_update[24] = J_CRTBP[3,0]*state_vector[27] + J_CRTBP[4,0]*state_vector[28] + J_CRTBP[5,0]*state_vector[29]
+#        state_update[25] = J_CRTBP[3,1]*state_vector[27] + J_CRTBP[4,1]*state_vector[28] + J_CRTBP[5,1]*state_vector[29]
+#        state_update[26] = J_CRTBP[3,2]*state_vector[27] + J_CRTBP[4,2]*state_vector[28] + J_CRTBP[5,2]*state_vector[29]
+#        state_update[27] = state_vector[24] - 2.0*state_vector[28]
+#        state_update[28] = state_vector[25] + 2.0*state_vector[27]
+#        state_update[29] = state_vector[26]
+#        
+#        state_update[30] = J_CRTBP[3,0]*state_vector[33] + J_CRTBP[4,0]*state_vector[34] + J_CRTBP[5,0]*state_vector[35]
+#        state_update[31] = J_CRTBP[3,1]*state_vector[33] + J_CRTBP[4,1]*state_vector[34] + J_CRTBP[5,1]*state_vector[35]
+#        state_update[32] = J_CRTBP[3,2]*state_vector[33] + J_CRTBP[4,2]*state_vector[34] + J_CRTBP[5,2]*state_vector[35]
+#        state_update[33] = state_vector[30] - 2.0*state_vector[34]
+#        state_update[34] = state_vector[31] + 2.0*state_vector[33]
+#        state_update[35] = state_vector[32]
+#
+#        state_update[36] = J_CRTBP[3,0]*state_vector[39] + J_CRTBP[4,0]*state_vector[40] + J_CRTBP[5,0]*state_vector[41]
+#        state_update[37] = J_CRTBP[3,1]*state_vector[39] + J_CRTBP[4,1]*state_vector[40] + J_CRTBP[5,1]*state_vector[41]
+#        state_update[38] = J_CRTBP[3,2]*state_vector[39] + J_CRTBP[4,2]*state_vector[40] + J_CRTBP[5,2]*state_vector[41]
+#        state_update[39] = state_vector[36] - 2.0*state_vector[40]
+#        state_update[40] = state_vector[37] + 2.0*state_vector[39]
+#        state_update[41] = state_vector[38]
+      
+        M_aux = np.dot(J_CRTBP, self._var)
         
-        state_update[30] = J_CRTBP[3,0]*state_vector[33] + J_CRTBP[4,0]*state_vector[34] + J_CRTBP[5,0]*state_vector[35]
-        state_update[31] = J_CRTBP[3,1]*state_vector[33] + J_CRTBP[4,1]*state_vector[34] + J_CRTBP[5,1]*state_vector[35]
-        state_update[32] = J_CRTBP[3,2]*state_vector[33] + J_CRTBP[4,2]*state_vector[34] + J_CRTBP[5,2]*state_vector[35]
-        state_update[33] = state_vector[30] - 2.0*state_vector[34]
-        state_update[34] = state_vector[31] + 2.0*state_vector[33]
-        state_update[35] = state_vector[32]
-
-        state_update[36] = J_CRTBP[3,0]*state_vector[39] + J_CRTBP[4,0]*state_vector[40] + J_CRTBP[5,0]*state_vector[41]
-        state_update[37] = J_CRTBP[3,1]*state_vector[39] + J_CRTBP[4,1]*state_vector[40] + J_CRTBP[5,1]*state_vector[41]
-        state_update[38] = J_CRTBP[3,2]*state_vector[39] + J_CRTBP[4,2]*state_vector[40] + J_CRTBP[5,2]*state_vector[41]
-        state_update[39] = state_vector[36] - 2.0*state_vector[40]
-        state_update[40] = state_vector[37] + 2.0*state_vector[39]
-        state_update[41] = state_vector[38]
+        for i in range(0, self._dim_pos_vel):
+            for j in range(0, self._dim_pos_vel):
+                state_update[(i+1)*self._dim_pos_vel + j] = M_aux[i,j]
+        
+#        print M_aux
+#        print state_vector
+#        print '******'
         
         self._f_eval = state_update
  
