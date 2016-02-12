@@ -47,15 +47,11 @@ class vertical_lyapunov:
         
     def go(self):
         
-        state_aux1 = np.zeros(6, dtype=np.double)
-        state_aux2 = np.zeros(6, dtype=np.double)
+        state_aux = np.zeros(6, dtype=np.double)
 
-        aux = np.zeros(6, dtype=np.double)
+        state_aux = self.continuation_step([1.09e+00  , 0.0 , 0.0 , 0.0, -4.2e-01,  7.3e-01] )
 
-        state_aux2 = self.continuation_step([1.09e+00  , 0.0 , 0.0 , 0.0, -4.2e-01,  7.3e-01] )
-
-        self._ini_state[0:6] = state_aux2
-
+        self._ini_state[0:6] = state_aux
         
     # this method computes the initial state of a lyapunov orbit with a given
     # "small" amplitude. It is used as step in the numerical continuation to find
