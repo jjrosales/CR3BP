@@ -13,8 +13,8 @@ class vertical_lyapunov:
 
     def __init__(self, CRTBP_DynSys, libration_point):
         
-        
         self._dim       = CRTBP_DynSys._dim 
+
         self._ini_state = np.zeros(self._dim, dtype=np.double) 
         
         self._model = CRTBP_DynSys
@@ -51,37 +51,10 @@ class vertical_lyapunov:
         state_aux2 = np.zeros(6, dtype=np.double)
 
         aux = np.zeros(6, dtype=np.double)
-#
-#        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-5)) 
-#        print self.Lyapunov_seed(5e-3)
-
-#        state_aux2 = self.Lyapunov_seed(5e-3)
-#        state_aux2 = self.continuation_step(self.Lyapunov_seed(1e-3))
 
         state_aux2 = self.continuation_step([1.09e+00  , 0.0 , 0.0 , 0.0, -4.2e-01,  7.3e-01] )
 
-#        
-#        print '1', self._period, self._model.get_Jacobi_Constant(), state_aux1, -(state_aux1[0]-self._L_i_x_coord )
-#        print '2', self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-#        
-#        aux        = 2.0*state_aux2 - state_aux1
-        
-#        for i in range(0,20):
-#            state_aux1 = state_aux2
-#            state_aux2 = self.continuation_step(aux)
-#            aux        = 2.0*state_aux2 - state_aux1
-#            
-#            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-
-#        state_aux2 = self.Lyapunov_seed(1e-5)
-
-#        aux =[0.809962649, 0.0, 0.0, 0.0, 0.234919529, 0.0]
-#        state_aux2 = self.continuation_step(aux)
-#        print self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-
-
         self._ini_state[0:6] = state_aux2
-#        print self._ini_state[0:6]
 
         
     # this method computes the initial state of a lyapunov orbit with a given
@@ -92,7 +65,6 @@ class vertical_lyapunov:
         state_vector = np.zeros(self._dim, dtype=np.double)
         ini_state    = np.zeros(self._dim, dtype=np.double)   
 
-        
         ini_state [0:6] = init_state_vec
         ini_state [6]   = 1.0
         ini_state [13]  = 1.0
@@ -193,7 +165,6 @@ class vertical_lyapunov:
                     
                     delta_vz = pos_vel[3]*a11-pos_vel[1]*a21
                     delta_vz = delta_vz/det                    
-
                     
                     ini_state[4] = ini_state[4] - delta_vy
                     ini_state[5] = ini_state[5] - delta_vz
