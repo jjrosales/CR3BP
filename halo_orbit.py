@@ -47,42 +47,11 @@ class halo_orbit:
         
     def go(self):
         
-        state_aux1 = np.zeros(6, dtype=np.double)
-        state_aux2 = np.zeros(6, dtype=np.double)
+        state_aux = np.zeros(6, dtype=np.double)
 
-        aux = np.zeros(6, dtype=np.double)
-#
-#        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-5)) 
-#        print self.Lyapunov_seed(5e-3)
+        state_aux = self.continuation_step(  [  self._L_i_x_coord - 0.0135 , 0.0 ,-0.16 , 0.0,    -0.222, 0.0])
 
-#        state_aux2 =  self.continuation_step(self.Lyapunov_seed(5e-3))
-        state_aux2 = self.continuation_step(  [  self._L_i_x_coord - 0.0135 , 0.0 ,-0.16 , 0.0,    -0.222, 0.0])
-
-#        state_aux2 = self.continuation_step([ 1.11002293e+00, 1.88800312e-02, 0.0, 6.24105548e-02,  -4.43333219e-01,  -6.87243904e-01])
-
-#        
-#        print '1', self._period, self._model.get_Jacobi_Constant(), state_aux1, -(state_aux1[0]-self._L_i_x_coord )
-#        print '2', self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-#        
-#        aux        = 2.0*state_aux2 - state_aux1
-        
-#        for i in range(0,20):
-#            state_aux1 = state_aux2
-#            state_aux2 = self.continuation_step(aux)
-#            aux        = 2.0*state_aux2 - state_aux1
-#            
-#            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-
-#        state_aux2 = self.Lyapunov_seed(1e-5)
-
-#        aux =[0.809962649, 0.0, 0.0, 0.0, 0.234919529, 0.0]
-#        state_aux2 = self.continuation_step(aux)
-#        print self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
-
-
-        self._ini_state[0:6] = state_aux2
-#        print self._ini_state[0:6]
-
+        self._ini_state[0:6] = state_aux
         
     # this method computes the initial state of a lyapunov orbit with a given
     # "small" amplitude. It is used as step in the numerical continuation to find
@@ -91,7 +60,6 @@ class halo_orbit:
         
         state_vector = np.zeros(self._dim, dtype=np.double)
         ini_state    = np.zeros(self._dim, dtype=np.double)   
-
         
         ini_state [0:6] = init_state_vec
         ini_state [6]   = 1.0
@@ -112,7 +80,7 @@ class halo_orbit:
             continue_flag = True
         
             old_z        = 0.0
-#            delta_vy     = 0.0  
+#            delta_z     = 0.0  
             state_vector = ini_state 
             self._time   = 0.0  
         
@@ -129,14 +97,12 @@ class halo_orbit:
                 state_vector = self._model.get_updated_state_vector()
                 time         = self._model.get_updated_time()
                 
-                pos_vel = self._model.get_updated_pos_vel()
                 var     = self._model.get_updated_var()
                 
                 self._time = self._time + self._dt
                    
                 # Poincare Map computation. The section is y = 0
                 z_coord = state_vector[1]
-                
                      
                 if (old_z*z_coord<0.0):   
             
@@ -166,14 +132,13 @@ class halo_orbit:
                     delta_vx = sv_aux[3]
                   
                     # computes the correction to be applied to the
-                    # vel_y component -- we assume x constant, y = vel_x = 0
+                    # z and vy components -- we assume x constant, vel_x = vel_z = 0
                     vx_dot  = self._model.get_f_eval()[3]
                     vz_dot  = self._model.get_f_eval()[5]
-                    pos_vel = sv_aux #self._model.get_updated_pos_vel()
                     var     = self._model.get_updated_var()
                     
-                    aux_coeff_1 = vx_dot/pos_vel[4]
-                    aux_coeff_2 = vz_dot/pos_vel[4]
+                    aux_coeff_1 = vx_dot/sv_aux[4]
+                    aux_coeff_2 = vz_dot/sv_aux[4]
                     
                     a11 = var[1,2]*aux_coeff_1
                     a11 = var[3,2] - a11
@@ -189,21 +154,16 @@ class halo_orbit:
                     
                     det = a11*a22 - a12*a21
                     
-                    delta_vy = pos_vel[3]*a22-pos_vel[5]*a12 
-                    delta_vy = delta_vy/det
+                    delta_z = sv_aux[3]*a22-sv_aux[5]*a12 
+                    delta_z = delta_z/det
                     
-                    delta_vz = pos_vel[5]*a11-pos_vel[3]*a21
+                    delta_vz = sv_aux[5]*a11-sv_aux[3]*a21
                     delta_vz = delta_vz/det                    
                     
-#                    print delta_v
-        
-#                    delta_vy = (var[3,4] - (var[1,4]*vdot_y)/pos_vel[4]) 
-#                    delta_vy = pos_vel[3]/delta_vy
-#                    
-                    ini_state[2] = ini_state[2] - delta_vy
+                    ini_state[2] = ini_state[2] - delta_z
                     ini_state[4] = ini_state[4] - delta_vz
                     
-                    print  delta_vy,  delta_vz
+                    print  delta_z,  delta_vz
                     
                     continue_flag = False
                
