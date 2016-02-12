@@ -56,9 +56,9 @@ class vertical_lyapunov:
 #        print self.Lyapunov_seed(5e-3)
 
 #        state_aux2 = self.Lyapunov_seed(5e-3)
-        state_aux2 = self.continuation_step(  [ self._L_i_x_coord + 0.014 , 0.0 ,0.0 , 0.0,    -0.08, 0.01] )
+#        state_aux2 = self.continuation_step(self.Lyapunov_seed(1e-3))
 
-#        state_aux2 = self.continuation_step([ 1.11002293e+00, 1.88800312e-02, 0.0, 6.24105548e-02,  -4.43333219e-01,  -6.87243904e-01])
+        state_aux2 = self.continuation_step([1.09e+00  , 0.0 , 0.0 , 0.0, -4.2e-01,  7.3e-01] )
 
 #        
 #        print '1', self._period, self._model.get_Jacobi_Constant(), state_aux1, -(state_aux1[0]-self._L_i_x_coord )
@@ -134,8 +134,8 @@ class vertical_lyapunov:
                 
                 self._time = self._time + self._dt
                    
-                # Poincare Map computation. The section is y = 0
-                z_coord = state_vector[1]
+                # Poincare Map computation. The section is z = 0
+                z_coord = state_vector[2]
                 
                      
                 if (old_z*z_coord<0.0):   
@@ -146,7 +146,7 @@ class vertical_lyapunov:
                     delta = 0.0
             
                     while abs(z_coord)>self._tol_section:
-                        delta = -z_coord/self._model.get_f_eval()[1]
+                        delta = -z_coord/self._model.get_f_eval()[2]
                         self._model.set_initial_condition(sv_aux)
                         self._model.set_t0(t_aux)
                         self._model.set_tf(t_aux+delta)
@@ -156,7 +156,7 @@ class vertical_lyapunov:
                         sv_aux = self._model.get_updated_state_vector()
                         t_aux  = self._model.get_updated_time()
             
-                        z_coord = sv_aux[1]
+                        z_coord = sv_aux[2]
                     
                 
                     print   t_aux,  sv_aux[0:6]
@@ -168,46 +168,41 @@ class vertical_lyapunov:
                     # computes the correction to be applied to the
                     # vel_y component -- we assume x constant, y = vel_x = 0
                     vx_dot  = self._model.get_f_eval()[3]
-                    vz_dot  = self._model.get_f_eval()[5]
                     pos_vel = sv_aux #self._model.get_updated_pos_vel()
                     var     = self._model.get_updated_var()
                     
-                    aux_coeff_1 = vx_dot/pos_vel[4]
-                    aux_coeff_2 = vz_dot/pos_vel[4]
+                    aux_coeff_1 = pos_vel[4]/pos_vel[5]
+                    aux_coeff_2 = vx_dot/pos_vel[5]
                     
-                    a11 = var[1,2]*aux_coeff_1
-                    a11 = var[3,2] - a11
+                    a11 = var[2,4]*aux_coeff_1
+                    a11 = var[1,4] - a11
                     
-                    a12 = var[1,4]*aux_coeff_1
-                    a12 = var[3,4] - a12
+                    a12 = var[2,5]*aux_coeff_1
+                    a12 = var[1,5] - a12
 
-                    a21 = var[1,2]*aux_coeff_2
-                    a21 = var[5,2] - a21
+                    a21 = var[2,4]*aux_coeff_2
+                    a21 = var[3,4] - a21
 
-                    a22 = var[1,4]*aux_coeff_2
-                    a22 = var[5,4] - a22
+                    a22 = var[2,5]*aux_coeff_2
+                    a22 = var[3,5] - a22
                     
                     det = a11*a22 - a12*a21
                     
-                    delta_vy = pos_vel[3]*a22-pos_vel[5]*a12 
+                    delta_vy = pos_vel[1]*a22-pos_vel[3]*a12 
                     delta_vy = delta_vy/det
                     
-                    delta_vz = pos_vel[5]*a11-pos_vel[3]*a21
+                    delta_vz = pos_vel[3]*a11-pos_vel[1]*a21
                     delta_vz = delta_vz/det                    
+
                     
-#                    print delta_v
-        
-#                    delta_vy = (var[3,4] - (var[1,4]*vdot_y)/pos_vel[4]) 
-#                    delta_vy = pos_vel[3]/delta_vy
-#                    
-                    ini_state[2] = ini_state[2] - delta_vy
-                    ini_state[4] = ini_state[4] - delta_vz
+                    ini_state[4] = ini_state[4] - delta_vy
+                    ini_state[5] = ini_state[5] - delta_vz
                     
                     print  delta_vy,  delta_vz
                     
                     continue_flag = False
                
-                old_z = state_vector[1]  
+                old_z = state_vector[2]  
 
         if abs(self._time) >= self._max_time:
             print "** ERROR: orbit did not cross x-axis **"
@@ -248,7 +243,7 @@ class vertical_lyapunov:
         seed_state_vector[2] = 0.0
         seed_state_vector[3] = 0.0
         seed_state_vector[4] = v_y
-        seed_state_vector[5] = mu_bar
+        seed_state_vector[5] = mu_bar*v_y
        
         return seed_state_vector 
 
