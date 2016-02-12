@@ -101,7 +101,6 @@ class vertical_lyapunov:
                 state_vector = self._model.get_updated_state_vector()
                 time         = self._model.get_updated_time()
                 
-                pos_vel = self._model.get_updated_pos_vel()
                 var     = self._model.get_updated_var()
                 
                 self._time = self._time + self._dt
@@ -138,13 +137,12 @@ class vertical_lyapunov:
                     delta_vx = sv_aux[3]
                   
                     # computes the correction to be applied to the
-                    # vel_y component -- we assume x constant, y = vel_x = 0
+                    # vel_y and vel_z components -- we assume x constant, y = vel_x = 0
                     vx_dot  = self._model.get_f_eval()[3]
-                    pos_vel = sv_aux #self._model.get_updated_pos_vel()
                     var     = self._model.get_updated_var()
                     
-                    aux_coeff_1 = pos_vel[4]/pos_vel[5]
-                    aux_coeff_2 = vx_dot/pos_vel[5]
+                    aux_coeff_1 = sv_aux[4]/sv_aux[5]
+                    aux_coeff_2 = vx_dot/sv_aux[5]
                     
                     a11 = var[2,4]*aux_coeff_1
                     a11 = var[1,4] - a11
@@ -160,10 +158,10 @@ class vertical_lyapunov:
                     
                     det = a11*a22 - a12*a21
                     
-                    delta_vy = pos_vel[1]*a22-pos_vel[3]*a12 
+                    delta_vy = sv_aux[1]*a22-sv_aux[3]*a12 
                     delta_vy = delta_vy/det
                     
-                    delta_vz = pos_vel[3]*a11-pos_vel[1]*a21
+                    delta_vz = sv_aux[3]*a11-sv_aux[1]*a21
                     delta_vz = delta_vz/det                    
                     
                     ini_state[4] = ini_state[4] - delta_vy
