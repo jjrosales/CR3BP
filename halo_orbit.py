@@ -9,7 +9,7 @@ __status__     = "Prototype"
 import numpy as np
 
 
-class vertical_lyapunov:
+class halo_orbit:
 
     def __init__(self, CRTBP_DynSys, libration_point):
         
@@ -55,8 +55,8 @@ class vertical_lyapunov:
 #        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-5)) 
 #        print self.Lyapunov_seed(5e-3)
 
-#        state_aux2 = self.Lyapunov_seed(5e-3)
-        state_aux2 = self.continuation_step( [  self._L_i_x_coord - 0.0135 , 0.0 ,-0.16 , 0.0,    -0.22, 0.0])
+#        state_aux2 =  self.continuation_step(self.Lyapunov_seed(5e-3))
+        state_aux2 = self.continuation_step(  [  self._L_i_x_coord - 0.0135 , 0.0 ,-0.16 , 0.0,    -0.222, 0.0])
 
 #        state_aux2 = self.continuation_step([ 1.11002293e+00, 1.88800312e-02, 0.0, 6.24105548e-02,  -4.43333219e-01,  -6.87243904e-01])
 
@@ -172,8 +172,8 @@ class vertical_lyapunov:
                     pos_vel = sv_aux #self._model.get_updated_pos_vel()
                     var     = self._model.get_updated_var()
                     
-                    aux_coeff_1 = vx_dot/pos_vel[5]
-                    aux_coeff_2 = vz_dot/pos_vel[5]
+                    aux_coeff_1 = vx_dot/pos_vel[4]
+                    aux_coeff_2 = vz_dot/pos_vel[4]
                     
                     a11 = var[1,2]*aux_coeff_1
                     a11 = var[3,2] - a11
@@ -192,7 +192,7 @@ class vertical_lyapunov:
                     delta_vy = pos_vel[3]*a22-pos_vel[5]*a12 
                     delta_vy = delta_vy/det
                     
-                    delta_vz = pos_vel[3]*a11-pos_vel[5]*a21
+                    delta_vz = pos_vel[5]*a11-pos_vel[3]*a21
                     delta_vz = delta_vz/det                    
                     
 #                    print delta_v
@@ -201,7 +201,7 @@ class vertical_lyapunov:
 #                    delta_vy = pos_vel[3]/delta_vy
 #                    
                     ini_state[2] = ini_state[2] - delta_vy
-                    ini_state[4] = ini_state[4] + delta_vz
+                    ini_state[4] = ini_state[4] - delta_vz
                     
                     print  delta_vy,  delta_vz
                     
@@ -221,10 +221,12 @@ class vertical_lyapunov:
     def get_period(self):
         return self._period 
         
-    def Lyapunov_seed(self, amplitude):
+    def halo_seed(self, amplitude):
         
         seed_state_vector = np.zeros(6, dtype=np.double)
     
+        mu1 = 1.0 - self._mu   
+             
         L_plus_mu = self._L_i_x_coord + self._mu
         mu_bar = L_plus_mu - 1.0
         mu_bar = self._mu / abs(mu_bar*mu_bar*mu_bar)
