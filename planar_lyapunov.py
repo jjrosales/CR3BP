@@ -29,7 +29,7 @@ class planar_lyapunov:
         
         self._index = 0
         
-        self._tol_correction = 1e-12
+        self._tol_correction = 1e-8
 
         self._tol_section = 1e-12
 
@@ -40,6 +40,8 @@ class planar_lyapunov:
         self._period = 0.0        
         
         self._max_time = 6.28
+
+        self._all_ini_cond = []  
         
     def set_amplitude(self, amplitude):
         
@@ -52,22 +54,28 @@ class planar_lyapunov:
 
         aux = np.zeros(6, dtype=np.double)
 
-        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-5))        
+        state_aux1 = self.continuation_step(self.Lyapunov_seed(1e-4))      
+        self._all_ini_cond.append([self._period, state_aux1])  
+        
         state_aux2 = self.continuation_step(self.Lyapunov_seed(5e-3))
-        
+        self._all_ini_cond.append([self._period, state_aux2]) 
+
         aux        = 2.0*state_aux2 - state_aux1
-        
-        for i in range(0,5):
+
+        for i in range(0,25):
+            
+           
             state_aux1 = state_aux2
             state_aux2 = self.continuation_step(aux)
             aux        = 2.0*state_aux2 - state_aux1
+
+            self._all_ini_cond.append([self._period, state_aux2])  
             
             print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
 
 
 
         self._ini_state[0:6] = state_aux2
-        print self._ini_state[0:6]
 
         
     # this method computes the initial state of a lyapunov orbit with a given
@@ -171,6 +179,9 @@ class planar_lyapunov:
         
     def get_period(self):
         return self._period 
+        
+    def get_all_ini_cond(self):
+        return self._all_ini_cond
         
     def Lyapunov_seed(self, amplitude):
         
