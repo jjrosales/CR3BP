@@ -40,6 +40,8 @@ class halo_orbit:
         self._period = 0.0        
         
         self._max_time = 6.28
+
+        self._all_ini_cond = []          
         
     def set_amplitude(self, amplitude):
         
@@ -47,11 +49,37 @@ class halo_orbit:
         
     def go(self):
         
-        state_aux = np.zeros(6, dtype=np.double)
+#        state_aux = np.zeros(6, dtype=np.double)
+#
+#        state_aux = self.continuation_step( [ 0.82356264 , 0.   ,       1e-2 ,      0.  ,        0.1250304 ,  0.        ])
+#
+#        self._ini_state[0:6] = state_aux
+        
+        state_aux1 = np.zeros(6, dtype=np.double)
+        state_aux2 = np.zeros(6, dtype=np.double)
 
-        state_aux = self.continuation_step(  [  self._L_i_x_coord - 0.0135 , 0.0 ,-0.16 , 0.0,    -0.222, 0.0])
+        aux = np.zeros(6, dtype=np.double)
 
-        self._ini_state[0:6] = state_aux
+        state_aux1 = self.continuation_step(  [ 0.8235 , 0.   ,       1e-2 ,      0.  ,        0.124 ,  0.        ])      
+        self._all_ini_cond.append([self._period, state_aux1])  
+        
+        state_aux2 = self.continuation_step(  [ 0.82356264 , 0.   ,       2e-2 ,      0.  ,        0.1250304 ,  0.        ])
+        self._all_ini_cond.append([self._period, state_aux2]) 
+
+        aux        = 2.0*state_aux2 - state_aux1
+        
+        for i in range(0,150):
+                     
+            state_aux1 = state_aux2
+            state_aux2 = self.continuation_step(aux)
+            aux        = 2.0*state_aux2 - state_aux1
+
+            self._all_ini_cond.append([self._period, state_aux2])  
+            
+            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
+
+
+        self._ini_state[0:6] = state_aux2        
         
     # this method computes the initial state of a lyapunov orbit with a given
     # "small" amplitude. It is used as step in the numerical continuation to find
@@ -125,7 +153,7 @@ class halo_orbit:
                         z_coord = sv_aux[1]
                     
                 
-                    print   t_aux,  sv_aux[0:6]
+#                    print   t_aux,  sv_aux[0:6]
                     # stores period
                     self._period = 2.0*t_aux
                     
@@ -163,7 +191,7 @@ class halo_orbit:
                     ini_state[2] = ini_state[2] - delta_z
                     ini_state[4] = ini_state[4] - delta_vz
                     
-                    print  delta_z,  delta_vz
+#                    print  delta_z,  delta_vz
                     
                     continue_flag = False
                
@@ -180,6 +208,9 @@ class halo_orbit:
         
     def get_period(self):
         return self._period 
+
+    def get_all_ini_cond(self):
+        return self._all_ini_cond
         
     def halo_seed(self, amplitude):
         
