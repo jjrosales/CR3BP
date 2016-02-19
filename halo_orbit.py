@@ -60,15 +60,15 @@ class halo_orbit:
 
         aux = np.zeros(6, dtype=np.double)
 
-        state_aux1 = self.continuation_step(  [ 0.8235 , 0.   ,       1e-2 ,      0.  ,        0.124 ,  0.        ])      
+        state_aux1 = self.continuation_step([0.82356264, 0., 1e-3, 0., 0.1250304, 0. ])      
         self._all_ini_cond.append([self._period, state_aux1])  
         
-        state_aux2 = self.continuation_step(  [ 0.82356264 , 0.   ,       2e-2 ,      0.  ,        0.1250304 ,  0.        ])
+        state_aux2 = self.continuation_step([0.82356264, 0., 2e-3, 0., 0.1250304, 0.])
         self._all_ini_cond.append([self._period, state_aux2]) 
 
         aux        = 2.0*state_aux2 - state_aux1
         
-        for i in range(0,150):
+        for i in range(0,300):
                      
             state_aux1 = state_aux2
             state_aux2 = self.continuation_step(aux)
@@ -168,30 +168,30 @@ class halo_orbit:
                     aux_coeff_1 = vx_dot/sv_aux[4]
                     aux_coeff_2 = vz_dot/sv_aux[4]
                     
-                    a11 = var[1,2]*aux_coeff_1
-                    a11 = var[3,2] - a11
+                    a11 = var[1,0]*aux_coeff_1
+                    a11 = var[3,0] - a11
                     
                     a12 = var[1,4]*aux_coeff_1
                     a12 = var[3,4] - a12
 
-                    a21 = var[1,2]*aux_coeff_2
-                    a21 = var[5,2] - a21
+                    a21 = var[1,0]*aux_coeff_2
+                    a21 = var[5,0] - a21
 
                     a22 = var[1,4]*aux_coeff_2
                     a22 = var[5,4] - a22
                     
                     det = a11*a22 - a12*a21
                     
-                    delta_z = sv_aux[3]*a22-sv_aux[5]*a12 
-                    delta_z = delta_z/det
+                    delta_x = sv_aux[3]*a22-sv_aux[5]*a12 
+                    delta_x = delta_x/det
                     
                     delta_vz = sv_aux[5]*a11-sv_aux[3]*a21
                     delta_vz = delta_vz/det                    
                     
-                    ini_state[2] = ini_state[2] - delta_z
+                    ini_state[0] = ini_state[0] - delta_x
                     ini_state[4] = ini_state[4] - delta_vz
                     
-#                    print  delta_z,  delta_vz
+       #             print  delta_z,  delta_vz
                     
                     continue_flag = False
                
