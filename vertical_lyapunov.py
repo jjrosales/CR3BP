@@ -49,7 +49,13 @@ class vertical_lyapunov:
         
         state_aux = np.zeros(6, dtype=np.double)
 
-        state_aux = self.continuation_step([1.09e+00  , 0.0 , 0.0 , 0.0, -4.2e-01,  7.3e-01] )
+        aux = self.Lyapunov_seed(1e-5, 1e-5)
+        
+        print aux
+
+        state_aux = self.continuation_step(aux)
+
+#        state_aux = self.Lyapunov_seed(1e-3, 1e-5)
 
         self._ini_state[0:6] = state_aux
         
@@ -181,25 +187,27 @@ class vertical_lyapunov:
     def get_period(self):
         return self._period 
         
-    def Lyapunov_seed(self, amplitude):
+    def Lyapunov_seed(self, amplitude_x, amplitude_z):
         
         seed_state_vector = np.zeros(6, dtype=np.double)
     
         L_plus_mu = self._L_i_x_coord + self._mu
-        mu_bar = L_plus_mu - 1.0
-        mu_bar = self._mu / abs(mu_bar*mu_bar*mu_bar)
-        mu_bar = mu_bar + (1.0 - self._mu) * 1.0/abs(L_plus_mu*L_plus_mu*L_plus_mu)
+        c2 = L_plus_mu - 1.0
+        c2 = self._mu / abs(c2*c2*c2)
+        c2 = c2 + (1.0 - self._mu) * 1.0/abs(L_plus_mu*L_plus_mu*L_plus_mu)
         
-        nu = (9.0*mu_bar - 8.0)*mu_bar
-        nu = -np.sqrt(nu)
-        nu = mu_bar - 2.0 + nu
-        nu = 0.5*nu
+        lambda_ = (9.0*c2 - 8.0)*c2
+        lambda_ = -np.sqrt(lambda_)
+        lambda_ = c2 - 2.0 - lambda_
+        lambda_ = 0.5*lambda_
         
-        tau = nu*nu + 2.0*mu_bar + 1.0
-        tau = -tau/(2.0*nu)
+        k = lambda_*lambda_ + 2.0*c2 + 1.0
+        k = k/(2.0*lambda_)
         
-        A_x = amplitude
-        v_y = -A_x*nu*tau
+        A_x = amplitude_x
+        A_z = amplitude_z
+        v_y = -A_x*k*lambda_
+        v_z = A_z*np.sqrt(c2)
         
 #        3.18407778087
        
@@ -208,7 +216,7 @@ class vertical_lyapunov:
         seed_state_vector[2] = 0.0
         seed_state_vector[3] = 0.0
         seed_state_vector[4] = v_y
-        seed_state_vector[5] = mu_bar*v_y
+        seed_state_vector[5] = v_z
        
         return seed_state_vector 
 

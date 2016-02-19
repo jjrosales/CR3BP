@@ -96,7 +96,7 @@ print
 print 'generating plots...'
 print
 
-for i in range(0,150):
+for i in range(0,302, 10):
     #ini_state_vector[0:6] = vertical_lyapunov_po.get_state_ini() # [1.09132666e+00  , 0.0 , 0.0 , 0.0, -4.21422746e-01,  7.30277282e-01] 
     #ini_state_vector[0:6] = planar_lyapunov_po.get_all_ini_cond()[i][1]
     ini_state_vector[0:6] = halo_po.get_all_ini_cond()[i][1] #halo_po.get_state_ini() #
@@ -107,7 +107,7 @@ for i in range(0,150):
     ini_state_vector[34]  = 1.0
     ini_state_vector[41]  = 1.0
         
-    T_period = halo_po.get_period()
+    T_period = halo_po.get_all_ini_cond()[i][0] #halo_po.get_period()
     #T_period = planar_lyapunov_po.get_all_ini_cond()[i][0]
     #T_period = vertical_lyapunov_po.get_period()
     
@@ -149,49 +149,50 @@ for i in range(0,150):
         state_vector = DynSys.get_updated_state_vector()
         time         = DynSys.get_updated_time()
 
-    eigen_values = np.linalg.eig(DynSys.get_updated_var())[0]
-
+    eigen_values = np.linalg.eig(DynSys.get_jacobian(state_vector))[0]
+    
     num_im = 0
-#    for k in range(0,6):
-#        eig_re.append(eigen_values[k].real)
-#        eig_im.append(eigen_values[k].imag)        
-#        print eigen_values[k].real, eigen_values[k].imag 
-#        
+    for k in range(0,6):
+        eig_re.append(eigen_values[k].real)
+        eig_im.append(eigen_values[k].imag)        
+        print eigen_values[k].real, eigen_values[k].imag 
+        
 #    if abs(eigen_values[4].imag)<1e-4:
 #        num_im = num_im + 2
 
-    plt.figure(0)
-    plt.plot(eig_re, eig_im, 'o')    
+#    plt.figure(0)
+#    plt.plot(eig_re, eig_im, 'o')    
     
     
     plt.figure(1)
+    plt.xlabel('X')
+    plt.ylabel('Y')  
     plt.plot(L_i, 0, 'r*')
     plt.plot(1-MU, 0, 'bo')
-    if num_im == 0:
-        plt.plot(pos_x, pos_y, 'b')
-    if num_im == 2:
-        plt.plot(pos_x, pos_y, 'g')
-    if num_im == 4:
-        plt.plot(pos_x, pos_y, 'r')
-    if num_im == 6:
-        plt.plot(pos_x, pos_y, 'c')
+    plt.plot(pos_x, pos_y, 'g')
+
         
     
     plt.figure(2)
-    plt.plot(pos_y, pos_z)
+    plt.xlabel('Y')
+    plt.ylabel('Z')       
+    plt.plot(0, 0, 'bo')
+    plt.plot(pos_y, pos_z, 'g')
     
     plt.figure(3)
-    plt.plot(pos_x, pos_z)
+    plt.xlabel('X')
+    plt.ylabel('Z')      
+    plt.plot(L_i, 0, 'r*')
+    plt.plot(1-MU, 0, 'bo')
+    plt.plot(pos_x, pos_z, 'g')
     
-    plt.figure(4)
-    plt.plot(vel_z, vel_y)
-        
     
     fig = plt.figure(5)
     plt.hold(True)
     
     ax = fig.gca(projection='3d')
-    ax.plot([L_i], [0.0], [0.0], 'ro')
+    ax.plot([L_i], [0.0], [0.0], 'r*')
+    ax.plot([1-MU], [0.0], [0.0], 'bo')
 #    ax.plot([-MU], [0.0], [0.0], 'ro')
 #    ax.plot([1-MU],[0.0], [0.0], 'bo')
     ax.plot(pos_x, pos_y, pos_z, 'g')
