@@ -66,6 +66,12 @@ class halo_orbit:
         state_aux2 = self.continuation_step([0.82356264, 0., 2e-3, 0., 0.1250304, 0.])
         self._all_ini_cond.append([self._period, state_aux2]) 
 
+#        state_aux1 = self.continuation_step([1.12034502, 0., -5e-4, 0., 0.17606472, 0.])      
+#        self._all_ini_cond.append([self._period, state_aux1])  
+#        
+#        state_aux2 = self.continuation_step([1.12034502, 0., -1e-3, 0., 0.17606472, 0.])
+#        self._all_ini_cond.append([self._period, state_aux2]) 
+
         aux        = 2.0*state_aux2 - state_aux1
         
         for i in range(0,300):
@@ -107,8 +113,7 @@ class halo_orbit:
         
             continue_flag = True
         
-            old_z        = 0.0
-#            delta_z     = 0.0  
+            p_coord_eval_old = 0.0
             state_vector = ini_state 
             self._time   = 0.0  
         
@@ -130,17 +135,17 @@ class halo_orbit:
                 self._time = self._time + self._dt
                    
                 # Poincare Map computation. The section is y = 0
-                z_coord = state_vector[1]
+                p_coord_eval = state_vector[1]
                      
-                if (old_z*z_coord<0.0):   
+                if (p_coord_eval_old*p_coord_eval<0.0):   
             
                     sv_aux = state_vector
                     t_aux  = time
                     
                     delta = 0.0
             
-                    while abs(z_coord)>self._tol_section:
-                        delta = -z_coord/self._model.get_f_eval()[1]
+                    while abs(p_coord_eval)>self._tol_section:
+                        delta = -p_coord_eval/self._model.get_f_eval()[1]
                         self._model.set_initial_condition(sv_aux)
                         self._model.set_t0(t_aux)
                         self._model.set_tf(t_aux+delta)
@@ -150,7 +155,7 @@ class halo_orbit:
                         sv_aux = self._model.get_updated_state_vector()
                         t_aux  = self._model.get_updated_time()
             
-                        z_coord = sv_aux[1]
+                        p_coord_eval = sv_aux[1]
                     
                 
 #                    print   t_aux,  sv_aux[0:6]
@@ -191,11 +196,11 @@ class halo_orbit:
                     ini_state[0] = ini_state[0] - delta_x
                     ini_state[4] = ini_state[4] - delta_vz
                     
-       #             print  delta_z,  delta_vz
+#                    print  delta_x,  delta_vz
                     
                     continue_flag = False
                
-                old_z = state_vector[1]  
+                p_coord_eval_old = state_vector[1]  
 
         if abs(self._time) >= self._max_time:
             print "** ERROR: orbit did not cross x-axis **"
