@@ -40,8 +40,14 @@ class halo_orbit:
         self._period = 0.0        
         
         self._max_time = 6.28
+        
+        self._max_iter = 10
 
-        self._all_ini_cond = []          
+        self._all_ini_cond = []     
+        
+        self._x_coord_corrected_flag = True # If this is 'True' the coordinate correcter is x. Otherwise is z. x is the default. 
+        
+        self._coord_corrected = 0# This states the coordinate that is going to be corrected. 0 is x, 2 is z. x is default.       
         
     def set_amplitude(self, amplitude):
         
@@ -82,7 +88,7 @@ class halo_orbit:
 
             self._all_ini_cond.append([self._period, state_aux2])  
             
-            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, -(state_aux2[0]-self._L_i_x_coord )
+            print i, self._period, self._model.get_Jacobi_Constant(), state_aux2, self._index
 
 
         self._ini_state[0:6] = state_aux2        
@@ -173,27 +179,27 @@ class halo_orbit:
                     aux_coeff_1 = vx_dot/sv_aux[4]
                     aux_coeff_2 = vz_dot/sv_aux[4]
                     
-                    a11 = var[1,0]*aux_coeff_1
-                    a11 = var[3,0] - a11
+                    a11 = var[1,self._coord_corrected]*aux_coeff_1
+                    a11 = var[3,self._coord_corrected] - a11
                     
                     a12 = var[1,4]*aux_coeff_1
                     a12 = var[3,4] - a12
 
-                    a21 = var[1,0]*aux_coeff_2
-                    a21 = var[5,0] - a21
+                    a21 = var[1,self._coord_corrected]*aux_coeff_2
+                    a21 = var[5,self._coord_corrected] - a21
 
                     a22 = var[1,4]*aux_coeff_2
                     a22 = var[5,4] - a22
                     
                     det = a11*a22 - a12*a21
                     
-                    delta_x = sv_aux[3]*a22-sv_aux[5]*a12 
-                    delta_x = delta_x/det
+                    delta_p = sv_aux[3]*a22-sv_aux[5]*a12 
+                    delta_p = delta_p/det
                     
                     delta_vz = sv_aux[5]*a11-sv_aux[3]*a21
                     delta_vz = delta_vz/det                    
                     
-                    ini_state[0] = ini_state[0] - delta_x
+                    ini_state[self._coord_corrected] = ini_state[self._coord_corrected] - delta_p
                     ini_state[4] = ini_state[4] - delta_vz
                     
 #                    print  delta_x,  delta_vz
@@ -201,6 +207,23 @@ class halo_orbit:
                     continue_flag = False
                
                 p_coord_eval_old = state_vector[1]  
+
+            if self._index >= self._max_iter:
+                print '** Changing the poincare section! **'
+                ini_state [0:6] = init_state_vec
+                ini_state [6]   = 1.0
+                ini_state [13]  = 1.0
+                ini_state [20]  = 1.0
+                ini_state [27]  = 1.0
+                ini_state [34]  = 1.0
+                ini_state [41]  = 1.0
+                self._index = 0
+                if self._x_coord_corrected_flag:
+                    self._x_coord_corrected_flag = False
+                    self._coord_corrected = 2
+                elif self._x_coord_corrected_flag == False:
+                    self._x_coord_corrected_flag = True
+                    self._coord_corrected = 0
 
         if abs(self._time) >= self._max_time:
             print "** ERROR: orbit did not cross x-axis **"
