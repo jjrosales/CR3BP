@@ -57,7 +57,7 @@ class halo_orbit:
         
 #        state_aux = np.zeros(6, dtype=np.double)
 #
-#        state_aux = self.continuation_step( [ 0.82356264 , 0.   ,       1e-2 ,      0.  ,        0.1250304 ,  0.        ])
+#        state_aux = self.continuation_step([0.82336264, 0., 1e-3, 0., 0.12711096, 0.])
 #
 #        self._ini_state[0:6] = state_aux
         
@@ -66,10 +66,10 @@ class halo_orbit:
 
         aux = np.zeros(6, dtype=np.double)
 
-        state_aux1 = self.continuation_step([0.82356264, 0., 1e-3, 0., 0.1250304, 0. ])      
+        state_aux1 = self.continuation_step([0.82336264, 0., 1e-3, 0., 0.12711096, 0.])
         self._all_ini_cond.append([self._period, state_aux1])  
         
-        state_aux2 = self.continuation_step([0.82356264, 0., 2e-3, 0., 0.1250304, 0.])
+        state_aux2 = self.continuation_step([0.82336264, 0., 2e-3, 0., 0.12711096, 0.])
         self._all_ini_cond.append([self._period, state_aux2]) 
 
 #        state_aux1 = self.continuation_step([1.12034502, 0., -5e-4, 0., 0.17606472, 0.])      
