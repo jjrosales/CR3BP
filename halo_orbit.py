@@ -41,7 +41,7 @@ class halo_orbit:
         
         self._max_time = 6.28
         
-        self._max_iter = 10
+        self._max_iter = 12
 
         self._all_ini_cond = []     
         
