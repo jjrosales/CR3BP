@@ -153,25 +153,19 @@ class CRTBP_DynSys:
             
             r2 = aux + x_minus_mu1*x_minus_mu1
             r2 = np.sqrt(r2)
-    
-            U =     self._mu_1*r1*r1 
-            U = U + self._mu_2*r2*r2
-            U = -0.5*U
-            U = U - self._mu_1/r1
-            U = U - self._mu_2/r2
-    
+
+            U = self._state_vector[0]*self._state_vector[0]
+            U = U + y2
+            U = 0.5*U
+            U = U + self._mu_1/r1
+            U = U + self._mu_2/r2
+            U = U + 0.5*self._mu_1*self._mu_2
+
             self._JC =          - (self._state_vector[3]*self._state_vector[3]) 
             self._JC = self._JC - (self._state_vector[4]*self._state_vector[4])             
             self._JC = self._JC - (self._state_vector[5]*self._state_vector[5])
             self._JC = self._JC + 2.0*U
-            
-#            U = self._state_vector[0]*self._state_vector[0]
-#            U = U + y2
-#            U = 0.5*U
-#            U = U + self._mu_1/r1
-#            U = U + self._mu_2/r2
-#            U = U + 0.5*self._mu_1*self._mu_2               
-            
+
         return self._JC
         
     def get_exec_flag(self):
