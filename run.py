@@ -87,19 +87,31 @@ print DynSys.get_Jacobi_Constant()
 #
 #vertical_lyapunov_po.set_amplitude(1e-4) 
 #vertical_lyapunov_po.go()
-halo_po.set_amplitude(1e-4) 
-halo_po.go()
-#planar_lyapunov_po.set_amplitude(1e-4) 
-#planar_lyapunov_po.go()
+#halo_po.set_amplitude(1e-4) 
+#halo_po.go()
+planar_lyapunov_po.set_amplitude(1e-4) 
+planar_lyapunov_po.go()
 
 print
 print 'generating plots...'
 print
 
-for i in range(301, 0, -10):
+s1  = []
+s2  = []
+s3  = []
+s4  = []
+s5  = []
+s6  = []
+s1i = []
+s2i = []
+s3i = []
+
+e   = []
+
+for i in range(0, 202):
     #ini_state_vector[0:6] = vertical_lyapunov_po.get_state_ini() # [1.09132666e+00  , 0.0 , 0.0 , 0.0, -4.21422746e-01,  7.30277282e-01] 
-    #ini_state_vector[0:6] = planar_lyapunov_po.get_all_ini_cond()[i][1]
-    ini_state_vector[0:6] = halo_po.get_all_ini_cond()[i][1] #halo_po.get_state_ini() #
+    ini_state_vector[0:6] = planar_lyapunov_po.get_all_ini_cond()[i][1]
+    #ini_state_vector[0:6] = halo_po.get_all_ini_cond()[i][1] #halo_po.get_state_ini() #
     ini_state_vector[6]   = 1.0
     ini_state_vector[13]  = 1.0
     ini_state_vector[20]  = 1.0
@@ -107,8 +119,8 @@ for i in range(301, 0, -10):
     ini_state_vector[34]  = 1.0
     ini_state_vector[41]  = 1.0
         
-    T_period = halo_po.get_all_ini_cond()[i][0] #halo_po.get_period()
-    #T_period = planar_lyapunov_po.get_all_ini_cond()[i][0]
+    #T_period = halo_po.get_all_ini_cond()[i][0] #halo_po.get_period()
+    T_period = planar_lyapunov_po.get_all_ini_cond()[i][0]
     #T_period = vertical_lyapunov_po.get_period()
     
     pos_x = []
@@ -153,18 +165,67 @@ for i in range(301, 0, -10):
 
     eigen_values = np.linalg.eig(DynSys.get_updated_var())[0]
     
+#    for k in range(0,6):
+#        eig_re.append(eigen_values[k].real)
+#        eig_im.append(eigen_values[k].imag)        
+#        print eigen_values[k]
+#    s1.append(abs(eigen_values[0] + 1./eigen_values[1]))
+#    s2.append(abs(eigen_values[2] + 1./eigen_values[3]))
+#    s3.append(abs(eigen_values[4] + 1./eigen_values[5]))
+#    s1i.append(abs(eigen_values[1] + 1./eigen_values[0]))
+#    s2i.append(abs(eigen_values[3] + 1./eigen_values[2]))
+#    s3i.append(abs(eigen_values[5] + 1./eigen_values[4]))
+#    
+#    s1.append(abs(eigen_values[0]))
+#    s2.append(abs(eigen_values[2]))    
+#    
+#    if (abs(eigen_values[0])*abs(eigen_values[1])-1.0) < 1e-5 :
+#        s1i.append(abs(eigen_values[1]))
+#        s2i.append(abs(eigen_values[3]))
+#    else:
+#        s1i.append(abs(eigen_values[3]))
+#        s2i.append(abs(eigen_values[1]))
+#
+#    s3.append(abs(eigen_values[4]))
+#    s3i.append(abs(eigen_values[5]))    
+
+    s1.append(eigen_values[0] + 1.0/eigen_values[0])
+    s2.append(eigen_values[1] + 1.0/eigen_values[1])
+    s3.append(eigen_values[2] + 1.0/eigen_values[2])
+    s4.append(eigen_values[3] + 1.0/eigen_values[3])
+    s5.append(eigen_values[4] + 1.0/eigen_values[4])
+    s6.append(eigen_values[5] + 1.0/eigen_values[5])
+
+    e.append(DynSys.get_Jacobi_Constant())
     
-    for k in range(0,6):
-        eig_re.append(eigen_values[k].real)
-        eig_im.append(eigen_values[k].imag)        
-#        print eigen_values[k].real, eigen_values[k].imag 
-        
+#    print s1[-1], s1i[-1]
+#    print s2[-1], s2i[-1]
+#    print s3[-1], s3i[-1]
+#        
 #    if abs(eigen_values[4].imag)<1e-4 and num_im<10:
 #        num_im = num_im + 1
 #        print T_period, ini_state_vector[0:6]
+        
 
-    plt.figure(0)
-    plt.plot(eig_re, eig_im, 'o')    
+    plt.figure(11)
+    plt.plot(e, s1, '.')
+    plt.plot(e, s2, '.')
+    plt.plot(e, s3, '.')
+    plt.plot(e, s4, '.')
+    plt.plot(e, s5, '.')
+    plt.plot(e, s6, '.')
+    
+#    plt.figure(10)
+#    plt.plot(e, s1, 'g.')    
+#    plt.plot(e, s1i, 'g.')
+#    
+#    plt.figure(11)
+#    plt.plot(e, s2, 'b.') 
+#    plt.plot(e, s2i, 'b.')     
+#
+#    plt.figure(12)
+#    plt.plot(e, s3, 'r.') 
+#    plt.plot(e, s3i, 'r.') 
 
     plt.figure(1)
     plt.xlabel('X')
